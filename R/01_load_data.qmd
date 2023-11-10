@@ -3,3 +3,22 @@ title: "01_load_data"
 format: html
 editor: visual
 ---
+
+# Load libraries
+
+```{r}
+library("tidyverse")
+```
+
+# Load data
+
+```{r}
+data <- read_tsv(file = "data/_raw/nhgh.tsv")
+```
+
+# Write data
+
+```{r}
+write_tsv(x = data,
+          path = "data/01_dat_load.tsv")
+```
