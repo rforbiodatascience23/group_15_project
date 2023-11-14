@@ -36,7 +36,7 @@ meta_data <- read_tsv(file = "../data/_raw/nhgh.tsv",
                       col_select = c(1:5))
 
 measurements <- read_tsv(file = "../data/_raw/nhgh.tsv",
-                         col_select = -c(1:5))
+                         col_select = -c(2:5))
 
 #wrinting into two data files
 write_tsv(x = meta_data,
