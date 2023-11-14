@@ -1,6 +1,8 @@
 ---
 title: "04_augment"
-format: html
+format:
+  html:
+    embed-resources: true
 editor: visual
 ---
 
@@ -10,4 +12,26 @@ editor: visual
 #| message: false
 diabetes_data <- read_tsv(file = "../data/02_diabetes_data_clean.tsv",
                           na = "NA")
+```
+
+# Augment
+
+```{r}
+# Calculating "body fat percentage" and "conicity index"
+diabetes_data <- diabetes_data |> 
+  mutate(bin_sex = case_when(
+                    sex == "male" ~ 1,
+                    sex == "female" ~ 0
+                  ),
+         bfp = 1.39*bmi+0.16*age-10.34*bin_sex-9,
+         waist_m = waist/100,
+         height_m = height/100,
+         ci = waist_m/(0.109*sqrt(weight/(height_m))))
+```
+
+# Save data
+
+```{r}
+write_tsv(x = diabetes_data,
+          file = "../data/04_diabetes_data_augment.tsv")
 ```
