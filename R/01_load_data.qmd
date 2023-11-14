@@ -10,15 +10,16 @@ editor: visual
 library("tidyverse")
 ```
 
-# Load data
+# Load and save data
 
 ```{r}
-data <- read_tsv(file = "../data/_raw/nhgh.tsv")
-```
+# Create directory
+fs::dir_create(path = '../_raw')
 
-# Write data
+# Retrieve data if it does not exist
+raw_data <- read_tsv(file = "https://hbiostat.org/data/repo/nhgh.tsv")
 
-```{r}
-write_tsv(x = data,
-          path = "../data/01_dat_load.tsv")
+# Write raw data to disc
+write_tsv(x = raw_data,
+          file = "../_raw/nhgh.tsv")
 ```
