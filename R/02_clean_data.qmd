@@ -39,6 +39,18 @@ meta_data <- meta_data |>
 meta_data <- meta_data |>
   rename("id" = "seqn",
          "ethnicity" = "re")
+
+```
+
+Some of the income values are arbitrary categories (\> 20000, \< 20000). These values will be changed to NA.
+
+```{r}
+meta_data <- meta_data |> 
+  mutate(income = case_when(
+    income == '< 20000' ~ NA,
+    income == '> 20000' ~ NA,
+    .default = income
+  ))
 ```
 
 ```{r}
