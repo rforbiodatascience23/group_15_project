@@ -10,16 +10,39 @@ editor: visual
 library("tidyverse")
 ```
 
-# Load and save data
+# Load and save raw data
 
 ```{r}
+#| message: false
+
 # Create directory
-fs::dir_create(path = '../_raw')
+fs::dir_create(path = '../data/_raw')
 
 # Retrieve data if it does not exist
 raw_data <- read_tsv(file = "https://hbiostat.org/data/repo/nhgh.tsv")
 
 # Write raw data to disc
 write_tsv(x = raw_data,
-          file = "../_raw/nhgh.tsv")
+          file = "../data/_raw/nhgh.tsv")
+
+```
+
+# Create artificially split data file (for educational purposes)
+
+```{r}
+
+#reading the data files into two seperate data frames to demonstrate joining later
+meta_data <- read_tsv(file = "../data/_raw/nhgh.tsv",
+                      col_select = c(1:5))
+
+measurements <- read_tsv(file = "../data/_raw/nhgh.tsv",
+                         col_select = -c(1:5))
+
+#wrinting into two data files
+write_tsv(x = meta_data,
+          file = "../data/01_nhgh_meta_data.tsv")
+
+write_tsv(x = measurements,
+          file = "../data/01_nhgh_measurements.tsv")
+
 ```
