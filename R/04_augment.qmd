@@ -1,0 +1,13 @@
+---
+title: "04_augment"
+format: html
+editor: visual
+---
+
+# Load data
+
+```{r}
+#| message: false
+diabetes_data <- read_tsv(file = "../data/02_diabetes_data_clean.tsv",
+                          na = "NA")
+```
