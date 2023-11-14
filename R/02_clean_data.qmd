@@ -3,3 +3,69 @@ title: "02_clean_data"
 format: html
 editor: visual
 ---
+
+# Clear workspace
+
+```{r}
+rm(list = ls())
+```
+
+# Load libraries
+
+```{r}
+library("tidyverse")
+```
+
+# Load the data
+
+```{r}
+#| message: false
+meta_data <- read_tsv(file = "../data/01_nhgh_meta_data.tsv",
+                      na = "NA")
+
+measurements <- read_tsv(file = "../data/01_nhgh_measurements.tsv",
+                         na = "NA")
+```
+
+# Data wrangling
+
+```{r}
+# Round age
+meta_data <- meta_data |>
+  mutate(age = floor(age))
+
+
+# Rename columns
+meta_data <- meta_data |>
+  rename("id" = "seqn",
+         "ethnicity" = "re")
+```
+
+```{r}
+#Rename columns
+measurements <- measurements |>
+  rename("id" = "seqn",
+         "medication" = "tx",
+         "diagnosis" = "dx",
+         "weight" = "wt",
+         "height" = "ht",
+         "tri_skinfold" = "tri",
+         "sub_skinfold" = "sub",
+         "creatinine" = "SCr")
+```
+
+# Join the data
+
+```{r}
+#Join the data
+
+diabetes_data <- 
+  inner_join(x = meta_data,
+             y = measurements,
+             by = join_by(id))
+```
+
+```{r}
+write_tsv(x = diabetes_data,
+          file = "../data/02_diabetes_data_clean.tsv")
+```
