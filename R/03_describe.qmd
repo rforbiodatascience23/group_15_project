@@ -1,0 +1,118 @@
+---
+title: "03_describe"
+format: html
+editor: visual
+---
+## Description
+Diabetes Mellitus (DM) is a chronic disease that occurs either when the pancreas fails to produce sufficient amount of insulin or when the body cannot effectively utilize the insulin it generates. It is characterized by elevated levels of blood glucose, leading to progressive damage to critical organs such as the heart, blood vessels, eyes, nerves and kidneys. Globally, more than 422 million people have diabetes and 1.5 million deaths each year are directly attributed to diabetes. Access to affordable treatment, particularly insulin, is crucial for the survival of the people living with diabetes.
+
+Diabetic nephropathy, a severe complication of diabetes, involves injury to the blood vessels in the kidneys. Increased excretion of albumin in the urine, along with elevated levels of blood urea nitrogen and creatinine, serves as signs of diabetic kidney disease.
+
+## Data
+The data used in this project were gathered from the National Health and Nutrition Examination Survey (NHANES), a program dedicated to evaluating the health and nutritional status of adults and children in the United States.
+
+The data set contains 6795 observations from participants in the survey, with 20 different variables. These variables includes essential demographic information such as age, race, income. Additionally, anthropometric measurements including height, weight, head circumference, body mass index (BMI) along with waist, hip and limb circumferences as well as skinfold thickness.
+
+The NHANES data set available to the public from the repository of the Department of Biostatistics at the Vanderbilt University https://hbiostat.org/data/repo/nhgh.tsv
+
+
+# Clear workspace
+```{r}
+rm(list = ls())
+```
+
+# Load libraries
+```{r}
+library("tidyverse")
+```
+
+# Load the data
+```{r}
+#| message: false
+diabetes_data <- read_tsv(file = "../data/02_diabetes_data_clean.tsv",
+                      na = "NA")
+
+```
+
+# Age distribution plot
+```{r}
+age_dist <- ggplot(data = diabetes_data,
+       mapping = aes(x= age)) +
+  geom_histogram(color="blue", fill="light blue",binwidth = 1)
+
+age_dist
+```
+
+
+# Visualise the age distribution with their glucohemoglobin level in %, colored by people diagnosed with DM or Pre-DM (light blue)
+```{r}
+gh_level <- ggplot(data = diabetes_data,
+       mapping = aes(x= age,
+                     y= gh, 
+                     color = diagnosis)) +
+  geom_point()
+
+# gh_level
+```
+
+
+# Visualisation of the age distribution vs glucohemoglobin level, colored by diagnosis, and facet by different regions of america (different ethnicities)
+```{r}
+graph <- ggplot(diabetes_data, 
+                mapping = aes(x = age, 
+                              y = gh)) +
+  geom_point(aes(color = diagnosis)) +
+  facet_grid( ethnicity ~ sex ) +
+  labs(x = 'Age ', y = 'Glycohemoglobin level in %') +
+  ggtitle('Distribution of glycohemoglobin levels for different ages and ethnicities') +
+  theme_grey() +
+  theme(
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 10)
+  )
+graph
+  
+```
+
+
+
+# BMI vs gh
+```{r}
+BMI_gh <- ggplot(diabetes_data, aes(x = gh, y = bmi)) +
+  geom_point(aes(color = diagnosis)) +
+  #facet_grid( ethnicity ~ sex ) +
+  labs(y = 'BMI', x = 'Glycohemoglobin level in %') +
+  ggtitle('Distribution of glycohemoglobin levels for different BMIs') +
+  theme_grey() +
+  theme(
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 10)
+  )
+
+BMI_gh
+```
+
+# Income vs. Ethnicicity 
+```{r}
+income_gh <- ggplot(diabetes_data, 
+                    mapping = aes(x = income, 
+                                  y = gh)) +
+  geom_point(aes(color = medication)) +
+  facet_grid( ethnicity ~ sex) +
+  labs(y = 'gh level', 
+       x = 'Income intervals') +
+  ggtitle('Distribution of income compared with gh levels for different ethnicities') +
+  theme_grey() +
+  theme(
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 10),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+income_gh
+```
+
+
+
+
+
