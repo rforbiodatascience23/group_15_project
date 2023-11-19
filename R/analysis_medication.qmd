@@ -1,0 +1,84 @@
+---
+title: "Effect of medication"
+format:
+  html:
+    embed-resources: true
+editor: visual
+---
+
+# Load libraries
+
+```{r}
+library('tidyverse')
+library('patchwork')
+```
+
+
+# Load data
+
+```{r}
+#| message: false
+diabetes_data <- read_tsv(file = "../data/02_diabetes_data_clean.tsv",
+                          na = "NA")
+```
+
+# Look at the diagnosed and factor medication
+
+```{r}
+plotting_data <- diabetes_data |> 
+  filter(diagnosis == 1) |> 
+  mutate(medication = factor(medication))
+```
+
+
+```{r}
+p1 <- plotting_data |> 
+  ggplot(mapping = aes(x = medication,
+                       y = gh)) +
+  geom_boxplot() +
+  labs(x = '',
+       y = 'Glycohemoglobin (%)')
+```
+
+```{r}
+p2 <- plotting_data |> 
+  ggplot(mapping = aes(x = medication,
+                       y = albumin)) +
+  geom_boxplot() +
+  labs(x = '',
+       y = 'Albumin (g/dL)')
+```
+
+```{r}
+p3 <- plotting_data |> 
+  ggplot(mapping = aes(x = medication,
+                       y = bun)) +
+  geom_boxplot() + 
+  labs(x = 'Medication',
+       y = 'Blood urea nitrogen (mg/dL)')
+```
+
+```{r}
+p4 <- plotting_data |> 
+  ggplot(mapping = aes(x = medication,
+                       y = creatinine)) +
+  geom_boxplot() +
+  labs(x = 'Medication',
+       y = 'Creatinine (mg/dL)')
+```
+
+```{r}
+(p1+p2)/(p3+p4)
+```
+
+
+
+
+```{r}
+plotting_data |> 
+  ggplot(mapping = aes(x = medication,
+                       y = weight)) +
+  geom_boxplot()
+```
+
+
