@@ -1,0 +1,106 @@
+---
+title: "Analysis_prot_corr"
+format: html
+editor: visual
+---
+
+## Analysis: Correlation between Alb, Bun and Cre
+
+```{r}
+library('tidyverse')
+library('patchwork')
+library(ggplot2)
+```
+
+```{r}
+#| message: false
+diabetes_data <- read_tsv(file = "../data/04_diabetes_data_augment.tsv",
+                          na = "NA")
+
+diabetes_data
+```
+
+```{r}
+
+p1 <- ggplot(data = diabetes_data, aes(x = factor(diagnosis), y = albumin, fill = factor(diagnosis))) +
+  geom_boxplot() +
+  labs(
+    title = "Comparison of Alb, BUN, and Cre on diagnosed patient",
+    fill = "Diagnosis",
+    x = "Diagnosis",
+    y = "Albumin"
+  ) + 
+  theme_minimal()
+```
+
+```{r}
+p2 <- ggplot(data = diabetes_data, aes(x = factor(diagnosis), y = bun, fill = factor(diagnosis))) +
+  geom_boxplot() +
+  labs(
+    fill = "Diagnosis",
+    x = "Diagnosis",
+    y = "BUN"
+  ) + 
+  theme_minimal()
+```
+
+```{r}
+
+p3 <- ggplot(data = diabetes_data, aes(x = factor(diagnosis), y = creatinine, fill = factor(diagnosis))) +
+  geom_boxplot() +
+  labs(
+    fill = "Diagnosis",
+    x = "Diagnosis",
+    y = "Creatinine"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+
+p1 + p2 + p3 + plot_layout(guides = 'collect') 
+```
+
+```{r}
+
+p4 <- ggplot(data = diabetes_data, aes(x = albumin, y = creatinine, color = interaction(diagnosis))) +
+  geom_smooth(method = lm)  +
+  labs(
+    title = "Correlation between Alb, BUN, and Cre on diagnosed vs undiagnosed patient",
+    colour = "Diagnosis",
+    x = "Albumine",
+    y = "Creatinine"
+  ) +
+  theme_minimal()
+
+
+
+```
+
+```{r}
+p5 <- ggplot(data = diabetes_data, aes(x = albumin, y = bun, color = interaction(diagnosis))) +
+  geom_smooth(method = lm) +
+  labs(
+    colour = "Diagnosis",
+    x = "Albumine",
+    y = "BUN"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+
+p6 <- ggplot(data = diabetes_data, aes(x = creatinine, y = bun, color = interaction(diagnosis))) +
+  geom_smooth(method = lm) +
+  labs(
+    colour = "Diagnosis",
+    y= "BUN",
+    x = "Creatinine"
+  ) +
+  theme_minimal()
+
+```
+
+```{r}
+p4 + p5 + p6 + plot_layout(guides = 'collect') 
+```
