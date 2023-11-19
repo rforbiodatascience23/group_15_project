@@ -3,30 +3,22 @@ title: "03_describe"
 format: html
 editor: visual
 ---
-## Description
-Diabetes Mellitus (DM) is a chronic disease that occurs either when the pancreas fails to produce sufficient amount of insulin or when the body cannot effectively utilize the insulin it generates. It is characterized by elevated levels of blood glucose, leading to progressive damage to critical organs such as the heart, blood vessels, eyes, nerves and kidneys. Globally, more than 422 million people have diabetes and 1.5 million deaths each year are directly attributed to diabetes. Access to affordable treatment, particularly insulin, is crucial for the survival of the people living with diabetes.
 
-Diabetic nephropathy, a severe complication of diabetes, involves injury to the blood vessels in the kidneys. Increased excretion of albumin in the urine, along with elevated levels of blood urea nitrogen and creatinine, serves as signs of diabetic kidney disease.
+# Clear Workspace
 
-## Data
-The data used in this project were gathered from the National Health and Nutrition Examination Survey (NHANES), a program dedicated to evaluating the health and nutritional status of adults and children in the United States.
-
-The data set contains 6795 observations from participants in the survey, with 20 different variables. These variables includes essential demographic information such as age, race, income. Additionally, anthropometric measurements including height, weight, head circumference, body mass index (BMI) along with waist, hip and limb circumferences as well as skinfold thickness.
-
-The NHANES data set available to the public from the repository of the Department of Biostatistics at the Vanderbilt University https://hbiostat.org/data/repo/nhgh.tsv
-
-
-# Clear workspace
 ```{r}
 rm(list = ls())
 ```
 
 # Load libraries
+
 ```{r}
 library("tidyverse")
+library("ggthemes")
 ```
 
-# Load the data
+# Load data
+
 ```{r}
 #| message: false
 diabetes_data <- read_tsv(file = "../data/02_diabetes_data_clean.tsv",
@@ -34,29 +26,139 @@ diabetes_data <- read_tsv(file = "../data/02_diabetes_data_clean.tsv",
 
 ```
 
+# How many observations of how many variables are there in the data?
+
+There are 6795 observation distributed in 20 different variables
+
+```{r}
+diabetes_data |>
+  dim()
+```
+
+With the different columns names
+
+```{r}
+diabetes_data |> 
+  colnames()
+```
+
+# Gender distribution
+
+The gender distribution in the study population is even distributed with 3423 female and 3372 male
+
+```{r}
+diabetes_data |>
+  group_by(sex) |>
+  count() |>
+```
+
 # Age distribution plot
+
+```{r}
+diabetes_data |> 
+  filter(sex == "female" |
+         sex == "male") |>
+
+    mutate(AgeGroup = case_when(
+      age > 10 & age <= 20 ~ "(10,20]",
+      age > 20 & age <= 30 ~ "(20,30]",
+      age > 30 & age <= 40 ~ "(30,40]",
+      age > 40 & age <= 50 ~ "(40,50]",
+      age > 50 & age <= 60 ~ "(50,60]",
+      age > 60 & age <= 70 ~ "(60,70]",
+      age > 70 & age <= 80 ~ "(70,80]")) |>
+      
+   mutate(AgeGroup = factor(AgeGroup,
+                        levels = c("(10,20]",
+                                   "(20,30]",
+                                   "(30,40]",
+                                   "(40,50]",
+                                   "(50,60]",
+                                   "(60,70]",
+                                   "(70,80]"))) |>
+  drop_na() |>
+
+  ggplot(mapping = aes(x = AgeGroup,
+                       fill = sex)) +
+  geom_bar(position="dodge",
+           alpha = 0.9,
+           color="black") + 
+  scale_color_colorblind() +
+  theme_minimal() +
+   labs(title = "Age distribution of the study population",
+       x = "Age groups",
+       y = "Number of people") +
+  theme(legend.position = "bottom")
+```
+
+# BMI distribution
+
+```{r}
+diabetes_data |>
+  ggplot(aes(x = bmi)) +
+  geom_histogram(color="darkblue",
+                 fill="lightblue",
+                 binwidth = 2) +
+  theme_minimal() +
+  labs(title = "BMI distribution in the study population",
+       x = bquote('BMI'~(kg/m^2)),
+       y = "Number of people") 
+```
+
+The BMI distribution for the study population based on the diabetes diagnose
+
+```{r}
+ggplot(diabetes_data,
+       mapping = aes(x = factor(diagnosis),
+                     y = bmi)) +
+geom_boxplot(aes(colour = factor(diagnosis))) +
+  theme_minimal() +
+  labs(title = "BMI distribution in the study population",
+       x = "Diabetes diagnosed",
+       y = bquote('BMI'~(kg/m^2))) +
+  theme(legend.position = "bottom")
+  
+```
+
+# BMI distribution based on the gender
+
+```{r}
+ggplot(diabetes_data,
+       mapping = aes(x = sex,
+                     y = bmi)) +
+geom_boxplot(aes(colour = factor(diagnosis))) +
+  theme_minimal() +
+  labs(title = "BMI distribution based on the gender in the study population",
+       x = "Diabetes diagnosed",
+       y = bquote('BMI'~(kg/m^2))) +
+  theme(legend.position = "bottom")
+```
+
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+
 ```{r}
 age_dist <- ggplot(data = diabetes_data,
-       mapping = aes(x= age)) +
-  geom_histogram(color="blue", fill="light blue",binwidth = 1)
-
+                   mapping = aes(x= age)) +
+geom_histogram(color="blue",
+               fill="light blue",
+               binwidth = 1)
 age_dist
 ```
 
-
 # Visualise the age distribution with their glucohemoglobin level in %, colored by people diagnosed with DM or Pre-DM (light blue)
+
 ```{r}
 gh_level <- ggplot(data = diabetes_data,
        mapping = aes(x= age,
                      y= gh, 
-                     color = diagnosis)) +
+                     color = factor(diagnosis))) +
   geom_point()
 
-# gh_level
+gh_level
 ```
 
-
 # Visualisation of the age distribution vs glucohemoglobin level, colored by diagnosis, and facet by different regions of america (different ethnicities)
+
 ```{r}
 graph <- ggplot(diabetes_data, 
                 mapping = aes(x = age, 
@@ -74,9 +176,8 @@ graph
   
 ```
 
-
-
 # BMI vs gh
+
 ```{r}
 BMI_gh <- ggplot(diabetes_data, aes(x = gh, y = bmi)) +
   geom_point(aes(color = diagnosis)) +
@@ -92,7 +193,8 @@ BMI_gh <- ggplot(diabetes_data, aes(x = gh, y = bmi)) +
 BMI_gh
 ```
 
-# Income vs. Ethnicicity 
+# Income vs. Ethnicicity
+
 ```{r}
 income_gh <- ggplot(diabetes_data, 
                     mapping = aes(x = income, 
@@ -112,7 +214,10 @@ income_gh <- ggplot(diabetes_data,
 income_gh
 ```
 
+```{r}
+age_dist <- ggplot(data = diabetes_data,
+       mapping = aes(x= age)) +
+  geom_histogram(color="blue", fill="light blue",binwidth = 1)
 
-
-
-
+age_dist
+```
