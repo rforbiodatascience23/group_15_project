@@ -1,0 +1,262 @@
+---
+title: "04_describe"
+format: html
+editor: visual
+---
+
+# Clear Workspace
+
+```{r}
+rm(list = ls())
+```
+
+# Load libraries
+
+```{r}
+library("tidyverse")
+library("ggthemes")
+```
+
+# Load data
+
+```{r}
+#| message: false
+diabetes_data <- read_tsv(file = '../data/02_diabetes_data_clean.tsv',
+                      na = 'NA')
+
+```
+
+# Observations and variables in the dataset
+
+There are 6795 observation distributed in 20 different variables
+
+```{r}
+diabetes_data |>
+  dim()
+```
+
+The variables have the different names
+
+```{r}
+diabetes_data |> 
+  colnames()
+```
+The data includes 5 different ethnicity groups with the following observations from each group
+```{r}
+table(diabetes_data $ethnicity)
+
+```
+
+
+# Gender distribution
+
+The gender distribution in the study population is even distributed with 3423 female and 3372 male
+
+```{r}
+gender_count <- diabetes_data |>
+  group_by(sex) |>
+  count() 
+gender_count
+```
+
+# Age distribution plot
+
+```{r}
+diabetes_data |> 
+  filter(sex == 'female' |
+         sex == 'male') |>
+
+    mutate(AgeGroup = case_when(
+      age > 10 & age <= 20 ~ '[10,20]',
+      age > 20 & age <= 30 ~ '[20,30]',
+      age > 30 & age <= 40 ~ '[30,40]',
+      age > 40 & age <= 50 ~ '[40,50]',
+      age > 50 & age <= 60 ~ '[50,60]',
+      age > 60 & age <= 70 ~ '[60,70]',
+      age > 70 & age <= 80 ~ '[70,80]')) |>
+      
+   mutate(AgeGroup = factor(AgeGroup,
+                        levels = c('[10,20]',
+                                   '[20,30]',
+                                   '[30,40]',
+                                   '[40,50]',
+                                   '[50,60]',
+                                   '[60,70]',
+                                   '[70,80]'))) |>
+  drop_na() |>
+
+  ggplot(mapping = aes(x = AgeGroup,
+                       fill = sex)) +
+  geom_bar(position='dodge',
+           alpha = 0.9,
+           color='black') + 
+  scale_color_colorblind() +
+  theme_minimal() +
+   labs(title = 'Age distribution of the study population',
+       x = 'Age groups',
+       y = 'Number of people') +
+  theme(legend.position = 'bottom')
+```
+
+A variable to consider here is the age, as the occurrence of observations with the age = 80 is around double as high as the next highest occurrence. 
+ 
+```{r}
+age_dist <- ggplot(data = diabetes_data,
+                   mapping = aes(x= age)) +
+geom_histogram(color='blue',
+               fill='light blue',
+               binwidth = 1)
+age_dist
+```
+
+This might be because this value is set to be 80+ in the study, and therefore includes everyone that is 80 years or higher. 
+
+
+# Age vs. high glucose level in the blod
+
+The following graph shows a visualization of the age distribution with their glucohemoglobin level in %, colored by people diagnosed with DM or Pre-DM (light blue)
+
+# 
+
+```{r}
+gh_level <- ggplot(data = diabetes_data,
+       mapping = aes(x= age,
+                     y= gh, 
+                     color = factor(diagnosis))) +
+  geom_point() +
+  labs(x = 'BMI', 
+       y = 'Glycohemoglobin level in %',
+       color = 'Diagnosis')
+
+gh_level
+```
+
+From this we can see a trend for people with a higher glucose level to be diagnosed with DM or pre-DM. We therefore expect the glucose level to play an important factor in the development of the disease. 
+
+
+
+# BMI distribution of the study population
+
+```{r}
+diabetes_data |>
+  ggplot(aes(x = bmi)) +
+  geom_histogram(color='darkblue',
+                 fill='lightblue',
+                 binwidth = 2) +
+  theme_minimal() +
+  labs(title = 'BMI distribution in the study population',
+       x = bquote('BMI'~(kg/m^2)),
+       y = 'Number of people') 
+```
+Add age and gender?
+25 is overweight - add values in plot
+
+
+The BMI distribution for the study population based on the diabetes diagnose
+
+```{r}
+ggplot(diabetes_data,
+       mapping = aes(x = factor(diagnosis),
+                     y = bmi)) +
+geom_boxplot(aes(colour = factor(diagnosis))) +
+  theme_minimal() +
+  labs(title = 'BMI distribution in the study population',
+       x = 'Diabetes diagnosed',
+       y = bquote('BMI'~(kg/m^2)),
+       color = 'Diagnosis') +
+  theme(legend.position = 'bottom')
+  
+```
+# Notice the amount of ignored values for the undiagnosed persons?
+
+
+
+# BMI distribution based on the gender
+# RELEVANT?
+
+```{r}
+ggplot(diabetes_data,
+       mapping = aes(x = sex,
+                     y = bmi)) +
+geom_boxplot(aes(colour = factor(diagnosis))) +
+  theme_minimal() +
+  labs(title = 'BMI distribution based on the gender in the study population',
+       x = 'Diabetes diagnosed',
+       y = bquote('BMI'~(kg/m^2)),
+       color = 'Diagnosis') +
+  theme(legend.position = 'bottom')
+```
+
+# BMI vs glucose level in the blod
+
+```{r}
+BMI_gh <- ggplot(diabetes_data, aes(x = bmi, y = gh)) +
+  geom_point(aes(color = factor(diagnosis))) +
+  #facet_grid( ethnicity ~ sex ) +
+  labs(x = 'BMI', 
+       y = 'Glycohemoglobin level in %',
+       color = 'Diagnosis') +
+  ggtitle('Distribution of glycohemoglobin levels for the BMIs of the study') +
+  theme_grey() +
+  theme(
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 10)
+  )
+
+BMI_gh
+```
+
+People with low BMI is not predisposed to have DM or pre-DM
+
+
+
+# Distribution of data for the different ethnicities 
+
+```{r}
+graph <- ggplot(diabetes_data, 
+                mapping = aes(x = age, 
+                              y = gh)) +
+  geom_point(aes(color = factor(diagnosis))) +
+  facet_grid( ethnicity ~ sex ) +
+  labs(x = 'Age ', 
+       y = 'Glycohemoglobin level in %', 
+       color = 'Diagnosis') +
+  ggtitle('Distribution of glycohemoglobin levels for different ages and ethnicities') +
+  theme_grey() +
+  theme(
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 10)
+  )
+graph
+  
+```
+
+
+# BMI compared to ages intervals?
+
+
+# Income vs. Ethnicicity
+# NOT RELEVANT
+
+```{r}
+# OBS add diagnosis??
+income_gh <- ggplot(diabetes_data, 
+                    mapping = aes(x = income, 
+                                  y = gh)) +
+  geom_point(aes(color = factor(diagnosis))) +
+  facet_grid( ethnicity ~ sex) +
+  labs(y = 'gh level', 
+       x = 'Income intervals',
+       color = 'Diagnosis') +
+  ggtitle('Distribution of income compared with gh levels for different ethnicities') +
+  theme_grey() +
+  theme(
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 10),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+income_gh
+```
+
+
