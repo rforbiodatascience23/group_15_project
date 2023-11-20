@@ -1,0 +1,181 @@
+---
+title: "Linear regression analysis"
+format: html
+editor: visual
+---
+
+# Clear Workspace
+
+```{r}
+rm(list = ls())
+```
+
+# Load Libraries
+
+```{r}
+library("tidyverse")
+library("patchwork")
+```
+
+# Load data
+
+```{r}
+#| message: false
+diabetes_data <- read_tsv(file = "../data/04_diabetes_data_augment.tsv")
+```
+
+# Linear regression
+
+Linear regression analysis of selected anthropometric parameters and indicators of diabetes.\
+The selected antropometric data were BMI, CI, BFP and Waist circumference.\
+The selected indicators for diabetes were
+
+```{r}
+cor_matrix <- diabetes_data |>
+  select(bmi, ci, waist_m, bfp, gh, albumin, bun, creatinine) |>
+  drop_na() |>
+  pivot_longer(cols = c(bmi, ci, waist_m, bfp),
+               names_to = "anthro",
+               values_to = "anthro_value") |>
+  pivot_longer(cols = c(gh, albumin, bun, creatinine),
+               names_to = "levels",
+               values_to = "levels_value") |>
+  group_by(anthro, levels) |>
+  summarise(coer = cor(x = anthro_value,
+                       y = levels_value,
+                       use = "complete.obs", 
+                       method = "pearson")) |>
+  pivot_wider(names_from = anthro,
+              values_from = coer)
+
+cor_matrix
+```
+
+Add R\^2 values to each of the correlations:
+
+```{r}
+corr_matrix <- cor_matrix |>
+  mutate(R2_bmi = round(bmi^2, digits = 3),
+         R2_ci = round(ci^2, digits = 3),
+         R2_waist_m = round(waist_m^2, digits = 3),
+         R2_bfp = round(bfp^2, digits = 3))
+
+corr_matrix
+```
+
+Heat map plot of the correlations selected anthropometric parameters and indicators of diabetes.
+
+```{r}
+cor_matrix |>
+  pivot_longer(cols = -levels,
+               names_to = "anthro_name",
+               values_to = "values") |>
+  ggplot(mapping = aes(x = levels,
+                       y = anthro_name)) +
+  geom_tile(aes(fill = values),
+            color = "black") +
+  geom_text(aes(label = round(values, digits = 2)),
+            color = "black",
+            size = 4) +
+  scale_fill_gradient2(high="red",
+                       mid="white",
+                       low="lightblue",
+                       midpoint = 0.1) +
+  theme_classic()+
+  theme(axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10))+
+  theme(legend.position = "bottom") +
+  labs(title = "Correlation matrix",
+       x = "Levels ",
+       y = "Anthropmetric measure",
+       fill = "Correlation")
+```
+
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+
+# Plot bmi vs. different measurements
+
+The correlaction between bmi and glycohemaglobin based on diabetes or not
+
+```{r}
+
+diabetes_data |>
+  select(bmi,gh,diagnosis)|>
+  drop_na() |>
+  ggplot(aes(x = bmi,
+             y = gh)) +
+  geom_point(colour = "grey",
+             size = 1.2) +
+  geom_smooth(method = "lm",
+              aes(color = factor(diagnosis))) +
+  theme_minimal() +
+  labs(title = "BMI and glycohemoglobin correlation",
+       x = bquote('BMI'~(kg/m^2)),
+       y = "Glycohemoglobin (%)") +
+  guides(color = guide_legend(title = "Diagnosis"))
+  
+```
+
+```{r}
+p1 <- ggplot(data = diabetes_data,
+       mapping = aes(x = bmi,
+                     y = gh,
+                     color = factor(diagnosis))) +
+  geom_point()
+
+p1
+
+```
+
+```{r}
+p2 <- ggplot(data = diabetes_data,
+       mapping = aes(x = bmi,
+                     y = albumin,
+                     color = factor(diagnosis))) +
+  geom_point()
+
+p2
+```
+
+```{r}
+p3 <- ggplot(data = diabetes_data,
+       mapping = aes(x = bmi,
+                     y = bun,
+                     color = factor(diagnosis))) +
+  geom_point()
+p3
+```
+
+```{r}
+p4 <- ggplot(data = diabetes_data,
+       mapping = aes(x = bmi,
+                     y = creatinine,
+                    color = factor(diagnosis))) +
+  geom_point()
+
+p4
+```
+
+```{r}
+ 
+(p1+p2)/(p3+p4)
+```
+
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+
+Correlation between BMI, BFP and CI for diabetes
+
+```{r}
+diabetes_data |>
+  filter( diagnosis == 1) |>
+  select(bmi, bfp, ci) |>
+  pivot_longer(cols = c(bfp, ci),
+               names_to = "metric",
+               values_to = "value") |>
+  drop_na() |>
+  group_by(metric) |>
+  summarise(correlation = cor(x = bmi,
+                      y = value,
+                      use = "complete.obs",
+                     method = "pearson"))
+```
