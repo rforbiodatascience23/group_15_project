@@ -44,7 +44,7 @@ meta_data <- read_tsv(file = "../data/_raw/nhgh.tsv",
 measurements <- read_tsv(file = "../data/_raw/nhgh.tsv",
                          col_select = -c(2:5))
 
-#Wrinting into two data files
+#Writing into two data files
 write_tsv(x = meta_data,
           file = "../data/01_nhgh_meta_data.tsv")
 
