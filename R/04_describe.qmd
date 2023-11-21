@@ -5,20 +5,18 @@ editor: visual
 ---
 
 # Clear Workspace
-
 ```{r}
 rm(list = ls())
 ```
 
 # Load libraries
-
 ```{r}
 library("tidyverse")
 library("ggthemes")
+library("patchwork")
 ```
 
 # Load data
-
 ```{r}
 #| message: false
 diabetes_data <- read_tsv(file = '../data/02_diabetes_data_clean.tsv',
@@ -29,21 +27,36 @@ diabetes_data <- read_tsv(file = '../data/02_diabetes_data_clean.tsv',
 # Observations and variables in the dataset
 
 There are 6795 observation distributed in 20 different variables
-
 ```{r}
 diabetes_data |>
   dim()
 ```
 
 The variables have the different names
-
 ```{r}
 diabetes_data |> 
   colnames()
 ```
-The data includes 5 different ethnicity groups with the following observations from each group
+
+Distribution of diagnosis
 ```{r}
-table(diabetes_data $ethnicity)
+non_diagnosed <- diabetes_data |> 
+  filter(diagnosis == 0) |>
+  count()
+
+diagnosed <- diabetes_data |> 
+  filter(diagnosis == 1) |>
+  count()
+
+medicated <- diabetes_data |> 
+  filter(medication == 1) |>
+  count()
+
+table <- data.frame( non_diagnosed, diagnosed, medicated)
+rownames(table) <- 'Count'
+colnames(table) <- c('Non diagnosed', 'Diagnosed', 'Medicated')
+print(table)
+
 
 ```
 
@@ -67,22 +80,22 @@ diabetes_data |>
          sex == 'male') |>
 
     mutate(AgeGroup = case_when(
-      age > 10 & age <= 20 ~ '[10,20]',
-      age > 20 & age <= 30 ~ '[20,30]',
-      age > 30 & age <= 40 ~ '[30,40]',
-      age > 40 & age <= 50 ~ '[40,50]',
-      age > 50 & age <= 60 ~ '[50,60]',
-      age > 60 & age <= 70 ~ '[60,70]',
-      age > 70 & age <= 80 ~ '[70,80]')) |>
+      age > 10 & age <= 19 ~ '(10,20]',
+      age > 20 & age <= 29 ~ '(20,30]',
+      age > 30 & age <= 39 ~ '(30,40]',
+      age > 40 & age <= 49 ~ '(40,50]',
+      age > 50 & age <= 59 ~ '(50,60]',
+      age > 60 & age <= 69 ~ '(60,70]',
+      age > 70 & age <= 80 ~ '(70,80]')) |>
       
    mutate(AgeGroup = factor(AgeGroup,
-                        levels = c('[10,20]',
-                                   '[20,30]',
-                                   '[30,40]',
-                                   '[40,50]',
-                                   '[50,60]',
-                                   '[60,70]',
-                                   '[70,80]'))) |>
+                        levels = c('(10,20]',
+                                   '(20,30]',
+                                   '(30,40]',
+                                   '(40,50]',
+                                   '(50,60]',
+                                   '(60,70]',
+                                   '(70,80]'))) |>
   drop_na() |>
 
   ggplot(mapping = aes(x = AgeGroup,
@@ -108,30 +121,7 @@ geom_histogram(color='blue',
                binwidth = 1)
 age_dist
 ```
-
-This might be because this value is set to be 80+ in the study, and therefore includes everyone that is 80 years or higher. 
-
-
-# Age vs. high glucose level in the blod
-
-The following graph shows a visualization of the age distribution with their glucohemoglobin level in %, colored by people diagnosed with DM or Pre-DM (light blue)
-
-# 
-
-```{r}
-gh_level <- ggplot(data = diabetes_data,
-       mapping = aes(x= age,
-                     y= gh, 
-                     color = factor(diagnosis))) +
-  geom_point() +
-  labs(x = 'BMI', 
-       y = 'Glycohemoglobin level in %',
-       color = 'Diagnosis')
-
-gh_level
-```
-
-From this we can see a trend for people with a higher glucose level to be diagnosed with DM or pre-DM. We therefore expect the glucose level to play an important factor in the development of the disease. 
+This might be because this value is set to be 80+ in the study, and therefore includes everyone that is 80 years or older. 
 
 
 
@@ -140,22 +130,23 @@ From this we can see a trend for people with a higher glucose level to be diagno
 ```{r}
 diabetes_data |>
   ggplot(aes(x = bmi)) +
-  geom_histogram(color='darkblue',
-                 fill='lightblue',
-                 binwidth = 2) +
+  annotate("rect", fill = "green", alpha = 0.4, 
+        xmin=18.5, xmax=24.9, ymin=0, ymax=+Inf) +
+  geom_histogram(color='darkblue', fill='lightblue', binwidth = 2) +
   theme_minimal() +
   labs(title = 'BMI distribution in the study population',
        x = bquote('BMI'~(kg/m^2)),
-       y = 'Number of people') 
+       y = 'Number of people')
 ```
-Add age and gender?
-25 is overweight - add values in plot
-
+We see a slightly overweight BMI average for the population of the study.
 
 The BMI distribution for the study population based on the diabetes diagnose
+for non-medicated people
 
 ```{r}
-ggplot(diabetes_data,
+non_medicated_data <- diabetes_data |>
+  filter(medication == 0)
+ggplot(non_medicated_data,
        mapping = aes(x = factor(diagnosis),
                      y = bmi)) +
 geom_boxplot(aes(colour = factor(diagnosis))) +
@@ -167,96 +158,94 @@ geom_boxplot(aes(colour = factor(diagnosis))) +
   theme(legend.position = 'bottom')
   
 ```
-# Notice the amount of ignored values for the undiagnosed persons?
+We see from the plot above that people diagnosed with DM or pre-DM generally have a slightly higher BMI average.
 
-
-
-# BMI distribution based on the gender
-# RELEVANT?
-
+# BMI compared based on ages intervals
 ```{r}
-ggplot(diabetes_data,
-       mapping = aes(x = sex,
-                     y = bmi)) +
-geom_boxplot(aes(colour = factor(diagnosis))) +
+non_medicated_data |> 
+  mutate(AgeGroup = case_when(
+      age > 10 & age <= 19 ~ '(10,20]',
+      age > 20 & age <= 29 ~ '(20,30]',
+      age > 30 & age <= 39 ~ '(30,40]',
+      age > 40 & age <= 49 ~ '(40,50]',
+      age > 50 & age <= 59 ~ '(50,60]',
+      age > 60 & age <= 69 ~ '(60,70]',
+      age > 70 & age <= 80 ~ '(70,80]')) |>
+      
+   mutate(AgeGroup = factor(AgeGroup,
+                        levels = c('(10,20]',
+                                   '(20,30]',
+                                   '(30,40]',
+                                   '(40,50]',
+                                   '(50,60]',
+                                   '(60,70]',
+                                   '(70,80]'))) |>
+  drop_na() |>
+
+  ggplot(mapping = aes(x = AgeGroup,
+                       y = bmi,
+                       fill = factor(diagnosis))) +
+  geom_boxplot(aes(color = factor(diagnosis)),
+           alpha = 0.9,
+           color='black') + 
+  scale_color_colorblind() +
   theme_minimal() +
-  labs(title = 'BMI distribution based on the gender in the study population',
-       x = 'Diabetes diagnosed',
-       y = bquote('BMI'~(kg/m^2)),
-       color = 'Diagnosis') +
+   labs(fill = 'Diagnosis',
+        title = 'BMI compared to age',
+        x = 'Age groups',
+        y = 'BMI') +
   theme(legend.position = 'bottom')
 ```
 
-# BMI vs glucose level in the blod
+The data includes 5 different ethnicity groups with the following observations from each group
 
 ```{r}
-BMI_gh <- ggplot(diabetes_data, aes(x = bmi, y = gh)) +
-  geom_point(aes(color = factor(diagnosis))) +
-  #facet_grid( ethnicity ~ sex ) +
-  labs(x = 'BMI', 
-       y = 'Glycohemoglobin level in %',
-       color = 'Diagnosis') +
-  ggtitle('Distribution of glycohemoglobin levels for the BMIs of the study') +
-  theme_grey() +
-  theme(
-    axis.title = element_text(size = 14),
-    axis.text = element_text(size = 10)
-  )
+f1 <- diabetes_data |> 
+  filter(ethnicity == 'Mexican American') |>
+  count()
 
-BMI_gh
+f2 <- diabetes_data |> 
+  filter(ethnicity == 'Non-Hispanic White') |>
+  count()
+
+f3 <- diabetes_data |> 
+  filter(ethnicity == 'Non-Hispanic Black') |>
+  count()
+
+f4 <- diabetes_data |> 
+  filter(ethnicity == 'Other Hispanic') |>
+  count()
+
+f5 <- diabetes_data |> 
+  filter(ethnicity == 'Other Race Including Multi-Racial') |>
+  count()
+
+Ethnicities <- data.frame(f1, f2, f3, f4, f5)
+rownames(Ethnicities) <- 'Count'
+colnames(Ethnicities) <- c('Mexican American', 'Non-Hispanic White', 'Non-Hispanic Black','Other Hispanic','Other Race Including Multi-Racial')
+print(Ethnicities)
 ```
 
-People with low BMI is not predisposed to have DM or pre-DM
-
-
-
-# Distribution of data for the different ethnicities 
-
+# Diagnosis and Medication grouped by Ethnicity
 ```{r}
-graph <- ggplot(diabetes_data, 
-                mapping = aes(x = age, 
-                              y = gh)) +
-  geom_point(aes(color = factor(diagnosis))) +
-  facet_grid( ethnicity ~ sex ) +
-  labs(x = 'Age ', 
-       y = 'Glycohemoglobin level in %', 
-       color = 'Diagnosis') +
-  ggtitle('Distribution of glycohemoglobin levels for different ages and ethnicities') +
-  theme_grey() +
-  theme(
-    axis.title = element_text(size = 14),
-    axis.text = element_text(size = 10)
-  )
-graph
-  
+combined_plot <- ggplot(diabetes_data, 
+                        aes(x = ethnicity, 
+                            fill = factor(medication), 
+                            group = interaction(ethnicity, factor(diagnosis)))) +
+  geom_bar(aes(y = ..count..), 
+           position = position_dodge(width = 0.7), 
+           stat = "count") +
+  scale_fill_manual(values = c("red", "blue"), 
+                    labels = c("Not Medicated", "Medicated")) +
+  labs(title = "Diagnosis and Medication by Ethnicity",
+       fill = "Medicated",
+       x = "Ethnicity",
+       y = "Count") +
+  facet_wrap(~ factor(diagnosis), scales = "free_x", 
+             labeller = as_labeller(c('0' = "Non Diagnosed", '1' = "Diagnosed"))) +
+  theme_minimal()
+
+print(combined_plot)
+
 ```
-
-
-# BMI compared to ages intervals?
-
-
-# Income vs. Ethnicicity
-# NOT RELEVANT
-
-```{r}
-# OBS add diagnosis??
-income_gh <- ggplot(diabetes_data, 
-                    mapping = aes(x = income, 
-                                  y = gh)) +
-  geom_point(aes(color = factor(diagnosis))) +
-  facet_grid( ethnicity ~ sex) +
-  labs(y = 'gh level', 
-       x = 'Income intervals',
-       color = 'Diagnosis') +
-  ggtitle('Distribution of income compared with gh levels for different ethnicities') +
-  theme_grey() +
-  theme(
-    axis.title = element_text(size = 14),
-    axis.text = element_text(size = 10),
-    axis.text.x = element_text(angle = 45, hjust = 1)
-  )
-
-income_gh
-```
-
 
