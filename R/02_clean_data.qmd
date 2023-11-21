@@ -45,7 +45,7 @@ meta_data <- meta_data |>
 Some of the income values are arbitrary categories (\> 20000, \< 20000). These values will be changed to NA.
 
 ```{r}
-# Change arbitrary catagories in the income values to NA
+# Change arbitrary categories in the income values to NA
 meta_data <- meta_data |> 
   mutate(income = case_when(
     income == '< 20000' ~ NA,
@@ -55,7 +55,7 @@ meta_data <- meta_data |>
 ```
 
 ```{r}
-# Rename columns in the measurment data 
+# Rename columns in the measurement data 
 measurements <- measurements |>
   rename("id" = "seqn",
          "medication" = "tx",
@@ -70,7 +70,6 @@ measurements <- measurements |>
 # Join the data into one tibble
 
 ```{r}
-# Join the data into one tibble
 diabetes_data <- 
   inner_join(x = meta_data,
              y = measurements,
@@ -80,7 +79,6 @@ diabetes_data <-
 # Write data to a clean datafile
 
 ```{r}
-# Write the tibble into a clean datafile
 write_tsv(x = diabetes_data,
           file = "../data/02_diabetes_data_clean.tsv")
 ```
