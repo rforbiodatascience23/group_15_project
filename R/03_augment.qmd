@@ -1,5 +1,5 @@
 ---
-title: "04_augment"
+title: "03_augment"
 format:
   html:
     embed-resources: true
@@ -17,7 +17,8 @@ diabetes_data <- read_tsv(file = "../data/02_diabetes_data_clean.tsv",
 # Augment
 
 ```{r}
-# Calculating "body fat percentage" and "conicity index"
+# Calculating "body fat percentage" and "conicity index".
+# Add new variables
 diabetes_data <- diabetes_data |> 
   mutate(bin_sex = case_when(
                     sex == "male" ~ 1,
@@ -35,13 +36,15 @@ diabetes_data <- diabetes_data |>
 ```
 
 ```{r}
+# Relocate the dm_status (Disease/Medication status)
 diabetes_data <- diabetes_data |> 
   relocate(dm_status, .after = diagnosis)
 ```
 
-# Save data
+# Write data
 
 ```{r}
+# Write data 
 write_tsv(x = diabetes_data,
-          file = "../data/04_diabetes_data_augment.tsv")
+          file = "../data/03_diabetes_data_augment.tsv")
 ```
