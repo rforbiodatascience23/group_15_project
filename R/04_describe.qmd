@@ -5,11 +5,13 @@ editor: visual
 ---
 
 # Clear Workspace
+
 ```{r}
 rm(list = ls())
 ```
 
 # Load libraries
+
 ```{r}
 library("tidyverse")
 library("ggthemes")
@@ -17,22 +19,25 @@ library("patchwork")
 ```
 
 # Load data
+
 ```{r}
 #| message: false
-diabetes_data <- read_tsv(file = '../data/02_diabetes_data_clean.tsv',
-                      na = 'NA')
+diabetes_data <- read_tsv(file = '../data/03_diabetes_data_augment.tsv',
+                          na = 'NA')
 
 ```
 
 # Observations and variables in the dataset
 
 There are 6795 observation distributed in 20 different variables
+
 ```{r}
 diabetes_data |>
   dim()
 ```
 
 The variables have the different names
+
 ```{r}
 diabetes_data |> 
   colnames()
@@ -40,212 +45,130 @@ diabetes_data |>
 
 Distribution of diagnosis
 ```{r}
-non_diagnosed <- diabetes_data |> 
-  filter(diagnosis == 0) |>
-  count()
-
-diagnosed <- diabetes_data |> 
-  filter(diagnosis == 1) |>
-  count()
-
-medicated <- diabetes_data |> 
-  filter(medication == 1) |>
-  count()
-
-table <- data.frame( non_diagnosed, diagnosed, medicated)
-rownames(table) <- 'Count'
-colnames(table) <- c('Non diagnosed', 'Diagnosed', 'Medicated')
-print(table)
-
-
+diabetes_data |>
+  count(dm_status)
 ```
-
 
 # Gender distribution
 
-The gender distribution in the study population is even distributed with 3423 female and 3372 male
+The gender distribution in the study population is evenly distributed with 3423 females and 3372 males.
 
 ```{r}
-gender_count <- diabetes_data |>
-  group_by(sex) |>
-  count() 
-gender_count
+diabetes_data |>
+  count(sex)
+```
+
+The data includes 5 different ethnicity groups with the following observations from each group
+
+```{r}
+diabetes_data |> 
+  count(ethnicity)
 ```
 
 # Age distribution plot
 
+A variable to consider here is the age, as the occurrence of observations with the age = 80 is around double as high as the next highest occurrence.
+
 ```{r}
-diabetes_data |> 
-  filter(sex == 'female' |
-         sex == 'male') |>
-
-    mutate(AgeGroup = case_when(
-      age > 10 & age <= 19 ~ '(10,20]',
-      age > 20 & age <= 29 ~ '(20,30]',
-      age > 30 & age <= 39 ~ '(30,40]',
-      age > 40 & age <= 49 ~ '(40,50]',
-      age > 50 & age <= 59 ~ '(50,60]',
-      age > 60 & age <= 69 ~ '(60,70]',
-      age > 70 & age <= 80 ~ '(70,80]')) |>
-      
-   mutate(AgeGroup = factor(AgeGroup,
-                        levels = c('(10,20]',
-                                   '(20,30]',
-                                   '(30,40]',
-                                   '(40,50]',
-                                   '(50,60]',
-                                   '(60,70]',
-                                   '(70,80]'))) |>
-  drop_na() |>
-
-  ggplot(mapping = aes(x = AgeGroup,
-                       fill = sex)) +
-  geom_bar(position='dodge',
-           alpha = 0.9,
-           color='black') + 
-  scale_color_colorblind() +
-  theme_minimal() +
-   labs(title = 'Age distribution of the study population',
-       x = 'Age groups',
-       y = 'Number of people') +
-  theme(legend.position = 'bottom')
-```
-
-A variable to consider here is the age, as the occurrence of observations with the age = 80 is around double as high as the next highest occurrence. 
- 
-```{r}
-age_dist <- ggplot(data = diabetes_data,
-                   mapping = aes(x= age)) +
-geom_histogram(color='blue',
+age_dist <- diabetes_data |> 
+  ggplot(mapping = aes(x= age)) +
+  geom_histogram(color='blue',
                fill='light blue',
-               binwidth = 1)
+               binwidth = 1) +
+  labs(title = 'Age distribution of the study population',
+       x = 'Age',
+       y = 'Number of people') +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+
 age_dist
 ```
-This might be because this value is set to be 80+ in the study, and therefore includes everyone that is 80 years or older. 
 
-
+This might be because this value is set to be 80+ in the study, and therefore includes everyone that is 80 years or older.
 
 # BMI distribution of the study population
 
 ```{r}
 diabetes_data |>
   ggplot(aes(x = bmi)) +
-  annotate("rect", fill = "green", alpha = 0.4, 
-        xmin=18.5, xmax=24.9, ymin=0, ymax=+Inf) +
-  geom_histogram(color='darkblue', fill='lightblue', binwidth = 2) +
+  annotate("rect", 
+           fill = "green", 
+           alpha = 0.4, 
+           xmin=18.5, 
+           xmax=24.9, 
+           ymin=0, 
+           ymax=+Inf) +
+  geom_histogram(color='darkblue', 
+                 fill='lightblue', 
+                 binwidth = 2) +
   theme_minimal() +
   labs(title = 'BMI distribution in the study population',
        x = bquote('BMI'~(kg/m^2)),
-       y = 'Number of people')
+       y = 'Number of people') +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
+
 We see a slightly overweight BMI average for the population of the study.
 
-The BMI distribution for the study population based on the diabetes diagnose
-for non-medicated people
+The BMI distribution for the study population based on the diabetes diagnosis for non-medicated people
 
 ```{r}
 non_medicated_data <- diabetes_data |>
-  filter(medication == 0)
-ggplot(non_medicated_data,
-       mapping = aes(x = factor(diagnosis),
-                     y = bmi)) +
-geom_boxplot(aes(colour = factor(diagnosis))) +
+  filter(medication == 0) |> 
+  mutate(diagnosis = factor(diagnosis))
+
+non_medicated_data |> 
+  ggplot(mapping = aes(x = diagnosis,
+                       y = bmi)) +
+  geom_boxplot(aes(colour = diagnosis)) +
   theme_minimal() +
+  scale_color_colorblind() +
   labs(title = 'BMI distribution in the study population',
-       x = 'Diabetes diagnosed',
+       x = 'Diabetes diagnosis',
        y = bquote('BMI'~(kg/m^2)),
        color = 'Diagnosis') +
-  theme(legend.position = 'bottom')
+  theme(legend.position = 'bottom') +
+  theme(plot.title = element_text(hjust = 0.5))
   
 ```
+
 We see from the plot above that people diagnosed with DM or pre-DM generally have a slightly higher BMI average.
 
 # BMI compared based on ages intervals
+
 ```{r}
 non_medicated_data |> 
   mutate(AgeGroup = case_when(
-      age > 10 & age <= 19 ~ '(10,20]',
-      age > 20 & age <= 29 ~ '(20,30]',
-      age > 30 & age <= 39 ~ '(30,40]',
-      age > 40 & age <= 49 ~ '(40,50]',
-      age > 50 & age <= 59 ~ '(50,60]',
-      age > 60 & age <= 69 ~ '(60,70]',
-      age > 70 & age <= 80 ~ '(70,80]')) |>
-      
-   mutate(AgeGroup = factor(AgeGroup,
-                        levels = c('(10,20]',
-                                   '(20,30]',
-                                   '(30,40]',
-                                   '(40,50]',
-                                   '(50,60]',
-                                   '(60,70]',
-                                   '(70,80]'))) |>
+                    age > 10 & age <= 19 ~ '(10,20]',
+                    age > 20 & age <= 29 ~ '(20,30]',
+                    age > 30 & age <= 39 ~ '(30,40]',
+                    age > 40 & age <= 49 ~ '(40,50]',
+                    age > 50 & age <= 59 ~ '(50,60]',
+                    age > 60 & age <= 69 ~ '(60,70]',
+                    age > 70 & age <= 80 ~ '(70,80]'),
+        AgeGroup = factor(AgeGroup,
+                          levels = c('(10,20]',
+                                     '(20,30]',
+                                     '(30,40]',
+                                     '(40,50]',
+                                     '(50,60]',
+                                     '(60,70]',
+                                     '(70,80]'))) |>
   drop_na() |>
-
   ggplot(mapping = aes(x = AgeGroup,
                        y = bmi,
-                       fill = factor(diagnosis))) +
-  geom_boxplot(aes(color = factor(diagnosis)),
-           alpha = 0.9,
-           color='black') + 
+                       fill = diagnosis)) +
+  geom_boxplot(aes(color = diagnosis),
+               alpha = 0.9,
+               color='black') + 
   scale_color_colorblind() +
   theme_minimal() +
-   labs(fill = 'Diagnosis',
-        title = 'BMI compared to age',
-        x = 'Age groups',
-        y = 'BMI') +
-  theme(legend.position = 'bottom')
+  labs(fill = 'Diagnosis',
+       title = 'BMI compared to age',
+       x = 'Age groups',
+       y = 'BMI') +
+  theme(legend.position = 'bottom') +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
-The data includes 5 different ethnicity groups with the following observations from each group
-
-```{r}
-f1 <- diabetes_data |> 
-  filter(ethnicity == 'Mexican American') |>
-  count()
-
-f2 <- diabetes_data |> 
-  filter(ethnicity == 'Non-Hispanic White') |>
-  count()
-
-f3 <- diabetes_data |> 
-  filter(ethnicity == 'Non-Hispanic Black') |>
-  count()
-
-f4 <- diabetes_data |> 
-  filter(ethnicity == 'Other Hispanic') |>
-  count()
-
-f5 <- diabetes_data |> 
-  filter(ethnicity == 'Other Race Including Multi-Racial') |>
-  count()
-
-Ethnicities <- data.frame(f1, f2, f3, f4, f5)
-rownames(Ethnicities) <- 'Count'
-colnames(Ethnicities) <- c('Mexican American', 'Non-Hispanic White', 'Non-Hispanic Black','Other Hispanic','Other Race Including Multi-Racial')
-print(Ethnicities)
-```
-
-# Diagnosis and Medication grouped by Ethnicity
-```{r}
-combined_plot <- ggplot(diabetes_data, 
-                        aes(x = ethnicity, 
-                            fill = factor(medication), 
-                            group = interaction(ethnicity, factor(diagnosis)))) +
-  geom_bar(aes(y = ..count..), 
-           position = position_dodge(width = 0.7), 
-           stat = "count") +
-  scale_fill_manual(values = c("red", "blue"), 
-                    labels = c("Not Medicated", "Medicated")) +
-  labs(title = "Diagnosis and Medication by Ethnicity",
-       fill = "Medicated",
-       x = "Ethnicity",
-       y = "Count") +
-  facet_wrap(~ factor(diagnosis), scales = "free_x", 
-             labeller = as_labeller(c('0' = "Non Diagnosed", '1' = "Diagnosed"))) +
-  theme_minimal()
-
-print(combined_plot)
-
-```
 
