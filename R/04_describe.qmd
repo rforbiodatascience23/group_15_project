@@ -1,6 +1,8 @@
 ---
 title: "04_describe"
-format: html
+format:
+  html:
+    embed-resources: true
 editor: visual
 ---
 
@@ -44,6 +46,7 @@ diabetes_data |>
 ```
 
 Distribution of diagnosis
+
 ```{r}
 diabetes_data |>
   count(dm_status)
@@ -170,5 +173,3 @@ non_medicated_data |>
   theme(legend.position = 'bottom') +
   theme(plot.title = element_text(hjust = 0.5))
 ```
-
-
