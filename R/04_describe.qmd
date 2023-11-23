@@ -111,7 +111,7 @@ diabetes_data |>
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-We see a slightly overweight BMI average for the population of the study.
+We see a slightly overweight BMI average for the population of the study as the green area marks the normal BMI range.
 
 The BMI distribution for the study population based on the diabetes diagnosis for non-medicated people
 
