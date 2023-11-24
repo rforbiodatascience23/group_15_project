@@ -32,6 +32,7 @@ model_data <- diabetes_data |>
 
 ```
 
+
 # Prepare training and testing data
 ```{r}
 set.seed(42)
@@ -58,7 +59,6 @@ logreg_fit <- logreg_spec |>
   fit(diagnosis ~ ., 
       data = data_train)
   
-logreg_fit
 ```
 
 # Test model
@@ -99,11 +99,11 @@ class_prob <- prediction |>
               predict(new_data = data_test, 
                       type = "prob"))
 
-class_prob
 ```
 
 
 ```{r}
+#| message: false
 # ROC graph
 roc_plot <- class_prob |>  
   roc_curve(truth = diagnosis, 
