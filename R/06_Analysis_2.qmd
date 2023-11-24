@@ -1,6 +1,8 @@
 ---
-title: "Linear regression analysis"
-format: html
+title: "Logistic Regression Model"
+format:
+  html:
+    embed-resources: true
 editor: visual
 ---
 
@@ -15,167 +17,110 @@ rm(list = ls())
 ```{r}
 library("tidyverse")
 library("patchwork")
+library("dplyr")
 ```
 
 # Load data
 
 ```{r}
 #| message: false
-diabetes_data <- read_tsv(file = "../data/04_diabetes_data_augment.tsv")
+diabetes_data <- read_tsv(file = "../data/03_diabetes_data_augment.tsv")
 ```
 
-# Linear regression
+# Logistic regression model
 
-Linear regression analysis of selected anthropometric parameters and indicators of diabetes.\
-The selected antropometric data were BMI, CI, BFP and Waist circumference.\
-The selected indicators for diabetes were
+Logistic regression modelling is performed to predict the variables that gives increase or decrease in the probability of a given outcome.
 
-```{r}
-cor_matrix <- diabetes_data |>
-  select(bmi, ci, waist_m, bfp, gh, albumin, bun, creatinine) |>
-  drop_na() |>
-  pivot_longer(cols = c(bmi, ci, waist_m, bfp),
-               names_to = "anthro",
-               values_to = "anthro_value") |>
-  pivot_longer(cols = c(gh, albumin, bun, creatinine),
-               names_to = "levels",
-               values_to = "levels_value") |>
-  group_by(anthro, levels) |>
-  summarise(coer = cor(x = anthro_value,
-                       y = levels_value,
-                       use = "complete.obs", 
-                       method = "pearson")) |>
-  pivot_wider(names_from = anthro,
-              values_from = coer)
+The model should predict a DM/pre-DM diagnosis based on anthropometric measurements and biomarkers.
 
-cor_matrix
-```
-
-Add R\^2 values to each of the correlations:
-
-```{r}
-corr_matrix <- cor_matrix |>
-  mutate(R2_bmi = round(bmi^2, digits = 3),
-         R2_ci = round(ci^2, digits = 3),
-         R2_waist_m = round(waist_m^2, digits = 3),
-         R2_bfp = round(bfp^2, digits = 3))
-
-corr_matrix
-```
-
-Heat map plot of the correlations selected anthropometric parameters and indicators of diabetes.
-
-```{r}
-cor_matrix |>
-  pivot_longer(cols = -levels,
-               names_to = "anthro_name",
-               values_to = "values") |>
-  ggplot(mapping = aes(x = levels,
-                       y = anthro_name)) +
-  geom_tile(aes(fill = values),
-            color = "black") +
-  geom_text(aes(label = round(values, digits = 2)),
-            color = "black",
-            size = 4) +
-  scale_fill_gradient2(high="red",
-                       mid="white",
-                       low="lightblue",
-                       midpoint = 0.1) +
-  theme_classic()+
-  theme(axis.text.x = element_text(size = 10),
-        axis.text.y = element_text(size = 10))+
-  theme(legend.position = "bottom") +
-  labs(title = "Correlation matrix",
-       x = "Levels ",
-       y = "Anthropmetric measure",
-       fill = "Correlation")
-```
-
-\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
-
-# Plot bmi vs. different measurements
-
-The correlaction between bmi and glycohemaglobin based on diabetes or not
+# Prepare data for model training
 
 ```{r}
 
-diabetes_data |>
-  select(bmi,gh,diagnosis)|>
-  drop_na() |>
-  ggplot(aes(x = bmi,
-             y = gh)) +
-  geom_point(colour = "grey",
-             size = 1.2) +
-  geom_smooth(method = "lm",
-              aes(color = factor(diagnosis))) +
-  theme_minimal() +
-  labs(title = "BMI and glycohemoglobin correlation",
-       x = bquote('BMI'~(kg/m^2)),
-       y = "Glycohemoglobin (%)") +
-  guides(color = guide_legend(title = "Diagnosis"))
-  
+model_data <- diabetes_data |> 
+  filter(medication == 0) |> 
+  drop_na() |> 
+  select(diagnosis ,weight,height,leg,arml,armc,waist,tri_skinfold,sub_skinfold,gh,albumin,bun,creatinine,bmi,ci,bfp) |> 
+  mutate(diagnosis = factor(diagnosis))
+
+```
+
+# Prepare training and testing data
+
+```{r}
+# Set seed for reproducibility
+set.seed(42)
+
+#Split data for training (70%)/testing (30%)
+data_split <- model_data |> 
+  initial_split(prop = 0.7)
+
+data_train <- training(data_split)
+data_test <- testing(data_split)
+
+```
+
+Perform the logistic model for the training data
+
+```{r}
+model <- glm(diagnosis ~. ,
+             family = "binomial",
+             data = data_train)
+
+summary(model)
 ```
 
 ```{r}
-p1 <- ggplot(data = diabetes_data,
-       mapping = aes(x = bmi,
-                     y = gh,
-                     color = factor(diagnosis))) +
-  geom_point()
-
-p1
+# Predict on the test set
+predictions <- predict(model, newdata = data_test, type = "response")
 
 ```
 
 ```{r}
-p2 <- ggplot(data = diabetes_data,
-       mapping = aes(x = bmi,
-                     y = albumin,
-                     color = factor(diagnosis))) +
-  geom_point()
+# Confusion matrix - NOT CORRECT TIDYVERSE CODE!!!!!!!!!!
+confusion_matrix <- table(data_test$diagnosis, predictions > 0.5)
 
-p2
+# Accuracy
+accuracy <- sum(diag(confusion_matrix))/sum(confusion_matrix)
+
+# Sensitivity and Specificity
+sensitivity <- confusion_matrix[2,2] / (confusion_matrix[2,1] + confusion_matrix[2,2])
+specificity <- confusion_matrix[1,1] / (confusion_matrix[1,1] + confusion_matrix[1,2])
+
+coef_table <- coef(summary(model))
+
+coef_table
 ```
 
 ```{r}
-p3 <- ggplot(data = diabetes_data,
-       mapping = aes(x = bmi,
-                     y = bun,
-                     color = factor(diagnosis))) +
-  geom_point()
-p3
-```
 
-```{r}
-p4 <- ggplot(data = diabetes_data,
-       mapping = aes(x = bmi,
-                     y = creatinine,
-                    color = factor(diagnosis))) +
-  geom_point()
+# Fit logistic regression model
+model1 <- glm(formula = diagnosis~gh + creatinine+
+                                  bfp + armc, family = "binomial", data = data_test)
 
-p4
-```
-
-```{r}
- 
-(p1+p2)/(p3+p4)
+#coef(model)
+exp(coef(model))
 ```
 
 \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
 
-Correlation between BMI, BFP and CI for diabetes
+# Logistic regression
 
 ```{r}
-diabetes_data |>
-  filter( diagnosis == 1) |>
-  select(bmi, bfp, ci) |>
-  pivot_longer(cols = c(bfp, ci),
-               names_to = "metric",
-               values_to = "value") |>
-  drop_na() |>
-  group_by(metric) |>
-  summarise(correlation = cor(x = bmi,
-                      y = value,
-                      use = "complete.obs",
-                     method = "pearson"))
+model1 <- glm(diagnosis ~ bmi, family = "binomial", data = diabetes_data)
+model2 <- glm(diagnosis ~ gh, family = "binomial", data = diabetes_data)
+
+summary(model2)
+```
+
+```{r}
+ diabetes_data |>
+   ggplot(aes(gh, diagnosis)) +
+   geom_point(alpha = 0.2) +
+   geom_smooth(method = "glm", method.args = list(family = "binomial")) +
+   labs(
+     title = "Logistic Regression Model", 
+     x = "GH Concentration",
+     y = "Probability of diabetes"
+     )
 ```
