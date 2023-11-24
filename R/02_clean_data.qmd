@@ -4,7 +4,7 @@ format: html
 editor: visual
 ---
 
-# Clear workspace
+# Clear Workspace
 
 ```{r}
 rm(list = ls())
@@ -16,7 +16,7 @@ rm(list = ls())
 library("tidyverse")
 ```
 
-# Load the data
+# Load data
 
 ```{r}
 #| message: false
@@ -30,12 +30,12 @@ measurements <- read_tsv(file = "../data/01_nhgh_measurements.tsv",
 # Data wrangling
 
 ```{r}
-# Round age
+# Round age to the nearest full year
 meta_data <- meta_data |>
   mutate(age = floor(age))
 
 
-# Rename columns
+# Rename columns in the metadata
 meta_data <- meta_data |>
   rename("id" = "seqn",
          "ethnicity" = "re")
@@ -45,6 +45,7 @@ meta_data <- meta_data |>
 Some of the income values are arbitrary categories (\> 20000, \< 20000). These values will be changed to NA.
 
 ```{r}
+# Change arbitrary categories in the income values to NA
 meta_data <- meta_data |> 
   mutate(income = case_when(
     income == '< 20000' ~ NA,
@@ -54,7 +55,7 @@ meta_data <- meta_data |>
 ```
 
 ```{r}
-#Rename columns
+# Rename columns in the measurement data 
 measurements <- measurements |>
   rename("id" = "seqn",
          "medication" = "tx",
@@ -66,16 +67,16 @@ measurements <- measurements |>
          "creatinine" = "SCr")
 ```
 
-# Join the data
+# Join the data into one tibble
 
 ```{r}
-#Join the data
-
 diabetes_data <- 
   inner_join(x = meta_data,
              y = measurements,
              by = join_by(id))
 ```
+
+# Write data to a clean datafile
 
 ```{r}
 write_tsv(x = diabetes_data,
