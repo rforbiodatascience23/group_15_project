@@ -61,13 +61,6 @@ diabetes_data |>
   count(sex)
 ```
 
-The data includes 5 different ethnicity groups with the following observations from each group
-
-```{r}
-diabetes_data |> 
-  count(ethnicity)
-```
-
 # Age distribution plot
 
 A variable to consider here is the age, as the occurrence of observations with the age = 80 is around double as high as the next highest occurrence.
@@ -158,40 +151,3 @@ bmi_dist_diagnosed
 ```
 
 We see from the plot above that people diagnosed with DM or pre-DM generally have a slightly higher BMI average.
-
-# BMI compared based on ages intervals
-
-```{r}
-non_medicated_data |> 
-  mutate(AgeGroup = case_when(
-                    age > 10 & age <= 19 ~ '(10,20]',
-                    age > 20 & age <= 29 ~ '(20,30]',
-                    age > 30 & age <= 39 ~ '(30,40]',
-                    age > 40 & age <= 49 ~ '(40,50]',
-                    age > 50 & age <= 59 ~ '(50,60]',
-                    age > 60 & age <= 69 ~ '(60,70]',
-                    age > 70 & age <= 80 ~ '(70,80]'),
-        AgeGroup = factor(AgeGroup,
-                          levels = c('(10,20]',
-                                     '(20,30]',
-                                     '(30,40]',
-                                     '(40,50]',
-                                     '(50,60]',
-                                     '(60,70]',
-                                     '(70,80]'))) |>
-  drop_na() |>
-  ggplot(mapping = aes(x = AgeGroup,
-                       y = bmi,
-                       fill = diagnosis)) +
-  geom_boxplot(aes(color = diagnosis),
-               alpha = 0.9,
-               color='black') + 
-  scale_color_colorblind() +
-  theme_minimal() +
-  labs(fill = 'Diagnosis',
-       title = 'BMI compared to age',
-       x = 'Age groups',
-       y = 'BMI') +
-  theme(legend.position = 'bottom') +
-  theme(plot.title = element_text(hjust = 0.5))
-```
