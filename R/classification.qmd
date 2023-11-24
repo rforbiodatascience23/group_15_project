@@ -25,6 +25,7 @@ The model should predict a DM/pre-DM diagnosis based on anthropometric measureme
 # Prepare data for model training
 ```{r}
 model_data <- diabetes_data |> 
+  filter(medication == 0) |> 
   drop_na() |> 
   select(diagnosis,weight,height,leg,arml,armc,waist,tri_skinfold,sub_skinfold,gh,albumin,bun,creatinine) |> 
   mutate(diagnosis = factor(diagnosis))
@@ -54,27 +55,29 @@ logreg_spec <- logistic_reg() |>
 # Train model
 ```{r}
 logreg_fit <- logreg_spec |> 
-  fit(diagnosis ~ ., data = data_train)
+  fit(diagnosis ~ ., 
+      data = data_train)
   
 logreg_fit
 ```
 
 # Test model
 ```{r}
-predicted_class <- data_test |> 
+prediction <- data_test |> 
   select(diagnosis) |> 
   bind_cols(logreg_fit |> 
               predict(new_data = data_test))
+
 ```
 
 # Check accuracy
 ```{r}
-accuracy(data = predicted_class, 
+accuracy(data = prediction, 
          truth = diagnosis,
          estimate = .pred_class)
 
 ```
-
+# Confusion matrix
 ```{r}
 conf_mat(data = predicted_class, 
          truth = diagnosis,
@@ -90,20 +93,49 @@ eval_metrics(data = predicted_class,
 ```
 
 ```{r}
-class_prob <- predicted_class |> 
+# Calculate the class probabilities
+class_prob <- prediction |> 
   bind_cols(logreg_fit |>  
               predict(new_data = data_test, 
                       type = "prob"))
-```
 
+class_prob
+```
 
 
 ```{r}
 # ROC graph
-class_prob %>% 
+roc_plot <- class_prob |>  
   roc_curve(truth = diagnosis, 
-            .pred_1)  |>  
-  autoplot()
+            .pred_1,
+            event_level = 'second') |> 
+  ggplot(mapping = aes(x = 1-specificity,
+                       y = sensitivity)) +
+  geom_path() +
+  geom_abline(slope = 1,
+              linetype = 'dotted') +
+  coord_fixed() +
+  theme_minimal() +
+  labs(title = 'ROC curve',
+       x = 'False Positive Rate (1 - specificity)',
+       y = 'True Positive Rate (sensitivity)') +
+  theme_bw(base_size = 14) +
+  theme(plot.title = element_text(hjust = 0.5)) 
+
+roc_plot
+
+ggsave(plot = roc_plot,
+       filename = '../results/classification_ROC_curve.png',
+       device = 'png')
+
+```
+
+# AUC
+```{r}
+class_prob |> 
+  roc_auc(diagnosis,
+          .pred_1,
+          event_level = 'second')
 ```
 
 
