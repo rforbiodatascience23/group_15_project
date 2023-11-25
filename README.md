@@ -27,4 +27,5 @@ The data analysis result will be presented by running the script titled "R/00_al
 
 ## Reference
 [1] World Health Organization. Diabetes. Accessed: November 25, 2023. https://www.who.int/news-room/fact-sheets/detail/diabetes
+
 [2] Vanderbilt Department of Biostatistics. NHANES glycohemoglobin data. https://hbiostat.org/data/
