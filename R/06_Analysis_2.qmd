@@ -17,7 +17,6 @@ rm(list = ls())
 ```{r}
 library("tidyverse")
 library("patchwork")
-library("dplyr")
 ```
 
 # Load data
@@ -29,98 +28,133 @@ diabetes_data <- read_tsv(file = "../data/03_diabetes_data_augment.tsv")
 
 # Logistic regression model
 
-Logistic regression modelling is performed to predict the variables that gives increase or decrease in the probability of a given outcome.
+Logistic regression modelling is performed to predict the variables that gives increase or decrease in the probability of a DM/pre-DM diagnosis. The model is based on anthropometric measurements and biomarkers.
 
-The model should predict a DM/pre-DM diagnosis based on anthropometric measurements and biomarkers.
+# Backwards selection model
 
-# Prepare data for model training
+Backwards selection to find to most significant variables
+
+```{r}
+# Riskfactor for the logistic regression model
+RiskFactor <- diabetes_data |>
+  filter(medication == 0) |>
+  dplyr::select(diagnosis,
+                weight,
+                height,
+                leg,
+                arml,
+                armc,
+                waist,
+                tri_skinfold,
+                sub_skinfold,
+                gh,
+                albumin,
+                bun,
+                creatinine)
+```
+
+```{r}
+#Replace the NA with 0 in the riskfactors
+RiskFactor <- RiskFactor |>
+  mutate_all(~if_else(is.na(.), 0, .))
+
+```
+
+```{r}
+# Performing backwards selection to find the best parameters for the logistic regression model
+model_full<-glm(diagnosis~.,
+                family = "binomial",
+                data = RiskFactor)
+
+model_min<-glm(diagnosis ~ weight,
+               family = "binomial",
+                data = RiskFactor)
+
+
+backwardsmodel <- stepAIC(model_full,
+                          direction = 'backward',
+                          scope = list(upper = model_full, 
+                                       lower = model_min))
+  
+
+summarybackward <- tidy(backwardsmodel)
+
+```
+
+```{r}
+# Add the odds ratio for the each variable to the summarybackward
+summarybackward <- summarybackward |>
+  mutate(OR = exp(estimate)) |>
+  relocate(OR, .after = term)
+
+summarybackward
+
+```
+
+```{r}
+# Show the predicted variables found by the model
+predictor <- summarybackward |> 
+  dplyr::select(term) |>
+  slice(2:n())
+
+predictor
+```
+
+# Logistic regression model of the variables found from the backwards selection
 
 ```{r}
 
 model_data <- diabetes_data |> 
   filter(medication == 0) |> 
   drop_na() |> 
-  select(diagnosis ,weight,height,leg,arml,armc,waist,tri_skinfold,sub_skinfold,gh,albumin,bun,creatinine,bmi,ci,bfp) |> 
+  dplyr::select(diagnosis,
+                weight,
+                leg,
+                waist,
+                tri_skinfold,
+                sub_skinfold,
+                gh,
+                albumin,
+                bun,
+                creatinine) |> 
   mutate(diagnosis = factor(diagnosis))
 
-```
-
-# Prepare training and testing data
-
-```{r}
-# Set seed for reproducibility
-set.seed(42)
-
-#Split data for training (70%)/testing (30%)
-data_split <- model_data |> 
-  initial_split(prop = 0.7)
-
-data_train <- training(data_split)
-data_test <- testing(data_split)
 
 ```
 
-Perform the logistic model for the training data
+# Performing the logistic regression model
 
 ```{r}
 model <- glm(diagnosis ~. ,
              family = "binomial",
-             data = data_train)
+             data = model_data)
 
 summary(model)
 ```
 
-```{r}
-# Predict on the test set
-predictions <- predict(model, newdata = data_test, type = "response")
+# Plot the most significant variable
 
-```
+The logistics regression model for glycohemoglobin levels (Highest significant) and diabetes is plotted.
 
 ```{r}
-# Confusion matrix - NOT CORRECT TIDYVERSE CODE!!!!!!!!!!
-confusion_matrix <- table(data_test$diagnosis, predictions > 0.5)
-
-# Accuracy
-accuracy <- sum(diag(confusion_matrix))/sum(confusion_matrix)
-
-# Sensitivity and Specificity
-sensitivity <- confusion_matrix[2,2] / (confusion_matrix[2,1] + confusion_matrix[2,2])
-specificity <- confusion_matrix[1,1] / (confusion_matrix[1,1] + confusion_matrix[1,2])
-
-coef_table <- coef(summary(model))
-
-coef_table
-```
-
-```{r}
-
-# Fit logistic regression model
-model1 <- glm(formula = diagnosis~gh + creatinine+
-                                  bfp + armc, family = "binomial", data = data_test)
-
-#coef(model)
-exp(coef(model))
-```
-
-\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
-
-# Logistic regression
-
-```{r}
-model1 <- glm(diagnosis ~ bmi, family = "binomial", data = diabetes_data)
-model2 <- glm(diagnosis ~ gh, family = "binomial", data = diabetes_data)
-
-summary(model2)
-```
-
-```{r}
- diabetes_data |>
+LR_model <- diabetes_data |>
    ggplot(aes(gh, diagnosis)) +
    geom_point(alpha = 0.2) +
-   geom_smooth(method = "glm", method.args = list(family = "binomial")) +
-   labs(
-     title = "Logistic Regression Model", 
-     x = "GH Concentration",
-     y = "Probability of diabetes"
-     )
+   geom_smooth(method = "glm",
+               method.args = list(family = "binomial")) +
+   labs(title = "Logistic Regression Model",
+        x = "Glycohemoglobin concentration (%)",
+        y = "Probability of diabetes") +
+   theme_minimal()
+
+LR_model
+```
+
+# Save the plots in results folder
+
+```{r}
+ggsave(LR_model, 
+       filename = "../Results/LR_model.png",
+       device = "png",
+       height = 15, width = 24, units = "cm")
 ```
