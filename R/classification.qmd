@@ -6,7 +6,14 @@ format:
 editor: visual
 ---
 
+# Clear Workspace
+
+```{r}
+rm(list = ls())
+```
+
 # Load libraries
+
 ```{r}
 #| message: false
 library('tidyverse')
@@ -14,26 +21,28 @@ library('tidymodels')
 ```
 
 # Load data
+
 ```{r}
 #| message: false
-diabetes_data <- read_tsv('../data/04_diabetes_data_augment.tsv',
+diabetes_data <- read_tsv('../data/03_diabetes_data_augment.tsv',
                           na = 'NA')
 ```
 
-The model should predict a DM/pre-DM diagnosis based on anthropometric measurements and biomarkers.
+The model should predict a DM/pre-DM diagnosis based on the variables found in the logistic regression analysis.
 
 # Prepare data for model training
+
 ```{r}
 model_data <- diabetes_data |> 
   filter(medication == 0) |> 
   drop_na() |> 
-  select(diagnosis,weight,height,leg,arml,armc,waist,tri_skinfold,sub_skinfold,gh,albumin,bun,creatinine) |> 
+  select(diagnosis,height,armc,tri_skinfold,gh,creatinine,bmi,bfp) |> 
   mutate(diagnosis = factor(diagnosis))
 
 ```
 
-
 # Prepare training and testing data
+
 ```{r}
 set.seed(42)
 
@@ -47,6 +56,7 @@ data_test <- testing(data_split)
 ```
 
 # Set model specification
+
 ```{r}
 logreg_spec <- logistic_reg() |> 
   set_engine("glm") |> 
@@ -54,6 +64,7 @@ logreg_spec <- logistic_reg() |>
 ```
 
 # Train model
+
 ```{r}
 logreg_fit <- logreg_spec |> 
   fit(diagnosis ~ ., 
@@ -62,6 +73,7 @@ logreg_fit <- logreg_spec |>
 ```
 
 # Test model
+
 ```{r}
 prediction <- data_test |> 
   select(diagnosis) |> 
@@ -71,15 +83,18 @@ prediction <- data_test |>
 ```
 
 # Check accuracy
+
 ```{r}
 accuracy(data = prediction, 
          truth = diagnosis,
          estimate = .pred_class)
 
 ```
+
 # Confusion matrix
+
 ```{r}
-conf_mat(data = predicted_class, 
+conf_mat(data = prediction, 
          truth = diagnosis,
          estimate = .pred_class)
 ```
@@ -87,7 +102,7 @@ conf_mat(data = predicted_class,
 ```{r}
 eval_metrics <- metric_set(ppv, recall, accuracy, f_meas)
 
-eval_metrics(data = predicted_class, 
+eval_metrics(data = prediction, 
              truth = diagnosis, 
              estimate = .pred_class)
 ```
@@ -100,7 +115,6 @@ class_prob <- prediction |>
                       type = "prob"))
 
 ```
-
 
 ```{r}
 #| message: false
@@ -131,14 +145,10 @@ ggsave(plot = roc_plot,
 ```
 
 # AUC
+
 ```{r}
 class_prob |> 
   roc_auc(diagnosis,
           .pred_1,
           event_level = 'second')
 ```
-
-
-
-
-
