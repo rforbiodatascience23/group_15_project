@@ -82,30 +82,58 @@ prediction <- data_test |>
 
 ```
 
-# Check accuracy
+# Make confusion matrix
 
 ```{r}
-accuracy(data = prediction, 
-         truth = diagnosis,
-         estimate = .pred_class)
+values <- prediction |> 
+  mutate(conf_value = case_when(diagnosis == 0 & .pred_class == 0 ~ '00',
+                                diagnosis == 0 & .pred_class == 1 ~ '01',
+                                diagnosis == 1 & .pred_class == 0 ~ '10',
+                                diagnosis == 1 & .pred_class == 1 ~ '11')) |> 
+  count(conf_value) |> 
+  pull(n)
+
+conf_data <- tibble(.rows = 4) |> 
+  mutate(truth = factor(c(0,0,1,1)),
+         pred = factor(c(0,1,0,1)),
+         n = values) 
+
 
 ```
 
-# Confusion matrix
+# Plot confusion matrix
 
 ```{r}
-conf_mat(data = prediction, 
-         truth = diagnosis,
-         estimate = .pred_class)
+#| message: false
+conf_plot <- conf_data |> 
+  ggplot(mapping = aes(x = truth,
+                       y = pred)) +
+  geom_tile(mapping = aes(fill = n),
+            show.legend = FALSE,
+            color = 'black',
+            size = 0.3) +
+  scale_fill_gradient(low = 'beige',
+                       high = 'skyblue3') +
+  geom_text(mapping = aes(label = n)) +
+  theme_minimal() +
+  labs(title = 'Confusion matrix',
+         x = 'Truth',
+         y = 'Prediction') +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_discrete(expand = c(0,0)) +
+  coord_fixed() +
+  theme_bw(base_size = 14) +
+  theme(plot.title = element_text(hjust = 0.5)) 
+
+conf_plot
+
+ggsave(plot = conf_plot,
+       filename = '../results/classification_conf_matrix.png',
+       device = 'png')
+
 ```
 
-```{r}
-eval_metrics <- metric_set(ppv, recall, accuracy, f_meas)
-
-eval_metrics(data = prediction, 
-             truth = diagnosis, 
-             estimate = .pred_class)
-```
+# ROC curve
 
 ```{r}
 # Calculate the class probabilities
