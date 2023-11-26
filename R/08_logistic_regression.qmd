@@ -138,6 +138,7 @@ LR_model <- diabetes_data |>
         x = "Glycohemoglobin concentration (%)",
         y = "Probability of diabetes") +
    theme_minimal() +
+   theme_bw(base_size = 14) +
    theme(plot.title = element_text(hjust = 0.5)) 
 
 LR_model
