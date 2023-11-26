@@ -8,7 +8,6 @@ format:
 author: "Katrine Meldgård, Margrethe Bøe Lysø, Kristine Rosted Petersen, Enrico Leonardi and Pernille Jensen"
 ---
 
-
 ## Introduction
 
 Diabetes Mellitus is a chronic disease.
@@ -16,33 +15,43 @@ Diabetes Mellitus is a chronic disease.
 -   Pancreas fails to produce sufficient amount of insulin.
 -   The body cannot effectively utilize the insulin it generates.
 
-Problem: More than 422 million people have diabetes and 1.5
-million deaths each year are directly attributed to diabetes.
+Problem: More than 422 million people have diabetes and 1.5 million deaths each year are directly attributed to diabetes.
 
 Kidney disease?
 
 AIM of the project
+
 ```{r, echo = FALSE, out.width = "800px"}
-knitr::include_graphics("../results/04_.png")
+#knitr::include_graphics("../results/04_.png")
 ```
 
-
 ## Method
+
 Data set contained X observations with X variables after cleaning
 
 Data Wrangling
 
-Added 
-
+Added
 
 ## Descriptive analysis
 
-
 ## Income vs. medication
 
-## Diagnosis effect on variables
+## Biomarkers and diagnosis/medication status
 
-## ???
+```{r, echo = FALSE, out.width = "800px"}
+knitr::include_graphics("../results/06_biomark_box.png")
+```
+
+## Physical attributes and disease/medication status
+
+```{r, echo = FALSE, out.width = "800px"}
+knitr::include_graphics("../results/06_phys_heat.png")
+```
+
+::: aside
+1: Undiagnosed, 2: Diagnosed, unmedicated, 3: Diagnosed, medicated
+:::
 
 ## PCA
 
@@ -51,7 +60,3 @@ Added
 ## Classification
 
 ## Discussion
-
-
-
-

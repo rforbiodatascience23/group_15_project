@@ -360,6 +360,16 @@ display: none;
 <div id="load-libraries" class="section level1">
 <h1>Load libraries</h1>
 <pre class="r"><code>library(&quot;tidyverse&quot;)</code></pre>
+<pre><code>## ── Attaching core tidyverse packages ────────────────────────── tidyverse 2.0.0 ──
+## ✔ dplyr     1.1.4     ✔ readr     2.1.4
+## ✔ forcats   1.0.0     ✔ stringr   1.5.1
+## ✔ ggplot2   3.4.4     ✔ tibble    3.2.1
+## ✔ lubridate 1.9.3     ✔ tidyr     1.3.0
+## ✔ purrr     1.0.2     
+## ── Conflicts ──────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
 </div>
 <div id="load-and-save-raw-data" class="section level1">
 <h1>Load and save raw data</h1>
@@ -379,7 +389,7 @@ write_tsv(x = raw_data,
 meta_data &lt;- read_tsv(file = &quot;../data/_raw/nhgh.tsv&quot;,
                       col_select = c(1:5))</code></pre>
 <pre><code>## Rows: 6795 Columns: 5
-## ── Column specification ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+## ── Column specification ──────────────────────────────────────────────────────────
 ## Delimiter: &quot;\t&quot;
 ## chr (3): sex, re, income
 ## dbl (2): seqn, age
@@ -389,9 +399,9 @@ meta_data &lt;- read_tsv(file = &quot;../data/_raw/nhgh.tsv&quot;,
 <pre class="r"><code>measurements &lt;- read_tsv(file = &quot;../data/_raw/nhgh.tsv&quot;,
                          col_select = -c(2:5))</code></pre>
 <pre><code>## Rows: 6795 Columns: 16
-## ── Column specification ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+## ── Column specification ──────────────────────────────────────────────────────────
 ## Delimiter: &quot;\t&quot;
-## dbl (16): seqn, tx, dx, wt, ht, bmi, leg, arml, armc, waist, tri, sub, gh, albumin, bun, SCr
+## dbl (16): seqn, tx, dx, wt, ht, bmi, leg, arml, armc, waist, tri, sub, gh, alb...
 ## 
 ## ℹ Use `spec()` to retrieve the full column specification for this data.
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
