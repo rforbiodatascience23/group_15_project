@@ -8,6 +8,7 @@ editor: visual
 
 ## Analysis: Biomarker levels for D/M status
 
+
 ### Loading libraries
 
 ```{r}
@@ -24,11 +25,12 @@ library('scales')
 #load augmented data
 #| message: false
 diabetes_data <- read_tsv(file = "../data/03_diabetes_data_augment.tsv",
-                          na = "NA")
+                          na = 'NA')
 
 ```
 
 ```{r}
+
 
 p1 <- diabetes_data |> 
       ggplot(mapping = aes(x = factor(dm_status), 
@@ -68,7 +70,6 @@ p2 <- diabetes_data |>
 ```
 
 ```{r}
-
 p3 <- diabetes_data |> 
       ggplot(mapping = aes(x = factor(dm_status), 
                            y = creatinine, 
@@ -113,9 +114,11 @@ biomark_box <- p1 + p2 + p3 + p4 +
   plot_layout(guides = 'collect',
               ncol = 2,
               ) +
+
   plot_annotation(title = 'Biomarker levels for the different D/M statuses') +
   theme(panel.background = element_rect(fill = "white", 
                                         color = "white"))
+
 
 ggsave(biomark_box, 
        filename = "../Results/biomark_box.png",
@@ -131,7 +134,6 @@ biomark_box
 ## Physical attributes stratified on undiagnosed, diagnosed/med and diagnosed/unmed patients
 
 ```{r}
-
 #standardizing and pivoting the physical attributes
 diabetes_standard <- diabetes_data |> 
         mutate(across(c(weight, bmi, armc, waist, tri_skinfold, sub_skinfold, bfp, ci), 
@@ -140,11 +142,9 @@ diabetes_standard <- diabetes_data |>
                      names_to = "attribute", 
                      values_to = "value")
 
-
 ```
 
 ```{r}
-
 phys_heat <- diabetes_standard |> 
     ggplot(mapping = aes(x = attribute, 
                          y = as.factor(dm_status), 
@@ -163,6 +163,7 @@ phys_heat <- diabetes_standard |>
     theme_minimal() +
     theme(panel.background = element_rect(fill = "white", 
                                          color = "white"))
+
 
 #1: Undiagnosed
 #2: Diagnosed unmed
