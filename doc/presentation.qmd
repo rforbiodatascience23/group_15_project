@@ -2,6 +2,7 @@
 title: "NHGH analysis"
 format:
   revealjs:
+     slide-number: true
      embed-resources: true
      theme: moon
       
@@ -104,8 +105,23 @@ knitr::include_graphics("../results/06_phys_heat.png")
 
 
 
-## Logistic regression model
+## Logistic regression model {.smaller}
+:::: {.columns}
+::: {.column width="30%"}
+- Backwards selection:
+   - Weight
+   - Leg
+   - Waist
+   - Creatinine
+   - Glycohemoglobin
+:::
+::: {.column width="67%"}
 
+```{r LR_model, echo=FALSE, out.width='100%'}
+knitr::include_graphics("../results/08_LR_model.png")
+```
+:::
+::::
 
 ## Classification 
 :::: {.columns}
@@ -130,6 +146,17 @@ knitr::include_graphics("../results/06_phys_heat.png")
 
 
 ## Discussion
+-  Relation between anthropocentric- and biomarker measurements.
+-  Classification and PCA: No clear relation.
+-  Confusion matrix: Low prediction for diabetes.
+-  Uneven distribution between diabetic and non-diabetic.
+    -  Improvement: Larger group of diabetic.
+
+-  Income classes and medication.
+
+
+Conclusion:
+Not any clear relation for diabetes.
 
 
 
