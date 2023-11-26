@@ -24,7 +24,7 @@ library("ggthemes")
 
 ```{r}
 #| message: false
-diabetes_data <- read_tsv(file = "../data/04_diabetes_data_augment.tsv",
+diabetes_data <- read_tsv(file = "../data/03_diabetes_data_augment.tsv",
                           na = "NA")
 ```
 
@@ -33,7 +33,19 @@ For PCA analysis we drop the observations that have NA values. We will use the o
 ```{r}
 model_data <- diabetes_data |> 
   filter(medication == 0) |> 
-  select(diagnosis,weight,height,leg,arml,armc,waist,tri_skinfold,sub_skinfold,gh,albumin,bun,creatinine) |> 
+  select(diagnosis, 
+         weight, 
+         height, 
+         leg, 
+         arml, 
+         armc,
+         waist,
+         tri_skinfold,
+         sub_skinfold,
+         gh,
+         albumin,
+         bun,
+         creatinine) |> 
   mutate(diagnosis = factor(diagnosis)) |> 
   drop_na()
 ```
@@ -77,9 +89,6 @@ ggsave(plot = pca_plot,
 
 ```
 
-
-
-
 # Variance explained by the principal components
 
 ```{r}
@@ -97,7 +106,7 @@ pc_variance <- pca_fit |>
                      expand = c(0,0)) +
   labs(title = 'Variance explained by each principal component',
        x = 'Principal Component',
-       y = 'Variance explained (percent)') +
+       y = 'Variance explained (%)') +
   theme_bw(base_size = 14) +
   theme(plot.title = element_text(hjust = 0.5)) 
 
@@ -107,7 +116,3 @@ ggsave(plot = pc_variance,
        filename = '../results/pc_variance.png',
        device = 'png')
 ```
-
-
-
-
