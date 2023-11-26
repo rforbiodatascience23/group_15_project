@@ -3,3 +3,17 @@ title: "00_all"
 format: html
 editor: visual
 ---
+
+# Run all scripts
+
+```{r}
+#| message: false
+rmarkdown::render(input = '01_load_data.qmd',
+                  output_dir = '../results')
+rmarkdown::render(input = '02_clean_data.qmd',
+                  output_dir = '../results')
+rmarkdown::render(input = '03_augment.qmd',
+                  output_dir = '../results')
+rmarkdown::render(input = '04_describe.qmd',
+                  output_dir = '../results')
+```
