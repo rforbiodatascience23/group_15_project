@@ -1,0 +1,179 @@
+---
+title: "Analysis Biomarker Boxplot and Phys. Att. Heatmap"
+format:
+  html:
+    embed-resources: true
+editor: visual
+---
+
+## Analysis: Biomarker levels for D/M status
+
+
+### Loading libraries
+
+```{r}
+library('tidyverse')
+library('patchwork')
+library('ggplot2')
+library('scales')
+
+```
+
+### Loading data
+
+```{r}
+#load augmented data
+#| message: false
+diabetes_data <- read_tsv(file = "../data/03_diabetes_data_augment.tsv",
+                          na = 'NA')
+
+```
+
+```{r}
+
+
+p1 <- diabetes_data |> 
+      ggplot(mapping = aes(x = factor(dm_status), 
+                           y = albumin, 
+                           fill = factor(dm_status))) +
+      geom_boxplot() +
+      labs(
+        fill = "Status",
+        x = "Status",
+        y = "Albumin(g/dL)"
+      ) + 
+      scale_x_discrete(labels = c('Undiagnosed','Diagnosed Med','Diagnosed Unmed')) +
+      theme_minimal() +
+      theme(legend.position="none",
+            axis.text.x = element_text(angle = 15,
+            ))
+
+```
+
+```{r}
+p2 <- diabetes_data |> 
+      ggplot(mapping = aes(x = factor(dm_status), 
+                           y = bun, 
+                           fill = factor(dm_status))) +
+      geom_boxplot() +
+      labs(
+        fill = "Status",
+        x = "Status",
+        y = "BUN (mg/dL)"
+      ) + 
+      scale_x_discrete(labels = c('Undiagnosed','Diagnosed Med','Diagnosed Unmed')) +
+      theme_minimal() +
+      theme(legend.position="none",
+            axis.text.x = element_text(angle = 15,
+            ))
+
+```
+
+```{r}
+p3 <- diabetes_data |> 
+      ggplot(mapping = aes(x = factor(dm_status), 
+                           y = creatinine, 
+                           fill = factor(dm_status))) +
+      geom_boxplot() +
+      labs(
+        fill = "Status",
+        x = "Status",
+        y = "Creatinine(mg/dL)"
+      ) + 
+      coord_cartesian(ylim = c(0, 7)) +
+      scale_x_discrete(labels = c('Undiagnosed','Diagnosed Med','Diagnosed Unmed')) +
+      theme_minimal() +
+      theme(legend.position="none",
+            axis.text.x = element_text(angle = 15,
+            ))
+```
+
+```{r}
+p4 <- diabetes_data |> 
+      ggplot(mapping = aes(x = factor(dm_status), 
+                           y = gh, 
+                           fill = factor(dm_status))) +
+      geom_boxplot() +
+      labs(
+        fill = "Status",
+        x = "Status",
+        y = "Glycohemoglobin(%)"
+      ) + 
+      scale_x_discrete(labels = c('Undiagnosed','Diagnosed Med','Diagnosed Unmed')) +
+      theme_minimal() +
+      theme(legend.position="none", 
+            axis.text.x = element_text(angle = 15,
+            ))
+
+```
+
+```{r}
+#| message: false
+
+biomark_box <- p1 + p2 + p3 + p4 + 
+  plot_layout(guides = 'collect',
+              ncol = 2,
+              ) +
+
+  plot_annotation(title = 'Biomarker levels for the different D/M statuses') +
+  theme(panel.background = element_rect(fill = "white", 
+                                        color = "white"))
+
+
+ggsave(biomark_box, 
+       filename = "../Results/biomark_box.png",
+       device = "png",
+       height = 20, 
+       width = 32, 
+       units = "cm")
+
+biomark_box
+
+```
+
+## Physical attributes stratified on undiagnosed, diagnosed/med and diagnosed/unmed patients
+
+```{r}
+#standardizing and pivoting the physical attributes
+diabetes_standard <- diabetes_data |> 
+        mutate(across(c(weight, bmi, armc, waist, tri_skinfold, sub_skinfold, bfp, ci), 
+                      scale)) |> 
+        pivot_longer(cols = c(weight, bmi, armc, waist, tri_skinfold, sub_skinfold, bfp, ci), 
+                     names_to = "attribute", 
+                     values_to = "value")
+
+```
+
+```{r}
+phys_heat <- diabetes_standard |> 
+    ggplot(mapping = aes(x = attribute, 
+                         y = as.factor(dm_status), 
+                         fill = value)) +
+    geom_tile() +
+    scale_fill_gradient2(midpoint = 0,
+                         low = "blue",
+                         mid = "white",
+                         high = "red",
+                         limits = c(-1.5, 1.5)) +
+    scale_x_discrete(labels = c('Arm C',"BFP", 'BMI',"CI",'SubScap skin', "Tricep skin", "Waist", "Weight")) +
+    labs(title = "Heatmap of D/M status vs. Physical attributes",
+         x = "Attributes",
+         y = "D/M status",
+         fill = "Value") + 
+    theme_minimal() +
+    theme(panel.background = element_rect(fill = "white", 
+                                         color = "white"))
+
+
+#1: Undiagnosed
+#2: Diagnosed unmed
+#3: Diagnosed, med
+
+ggsave(phys_heat, 
+       filename = "../Results/phys_heat.png",
+       device = "png",
+       height = 15, 
+       width = 24, 
+       units = "cm")
+
+```

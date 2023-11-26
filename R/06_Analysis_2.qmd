@@ -1,0 +1,152 @@
+---
+title: "Logistic Regression Model"
+format:
+  html:
+    embed-resources: true
+editor: visual
+---
+
+# Clear Workspace
+
+```{r}
+rm(list = ls())
+```
+
+# Load Libraries
+
+```{r}
+#| message: false
+library("tidyverse")
+library("patchwork")
+library("MASS")
+```
+
+# Load data
+
+```{r}
+#| message: false
+diabetes_data <- read_tsv(file = "../data/03_diabetes_data_augment.tsv",
+                          na = "NA")
+```
+
+# Logistic regression model
+
+Logistic regression modelling is performed to predict the variables that gives increase or decrease in the probability of a DM/pre-DM diagnosis. The model is based on anthropometric measurements and biomarkers.
+
+# Backwards selection model
+
+Backwards selection to find to most significant variables
+
+```{r}
+# Riskfactor for the logistic regression model
+RiskFactor <- diabetes_data |>
+  filter(medication == 0) |>
+  dplyr::select(diagnosis,
+                weight,
+                height,
+                leg,
+                arml,
+                armc,
+                waist,
+                tri_skinfold,
+                sub_skinfold,
+                gh,
+                albumin,
+                bun,
+                creatinine)
+```
+
+```{r}
+#Replace the NA with 0 in the riskfactors
+RiskFactor <- RiskFactor |>
+  drop_na()
+
+```
+
+```{r}
+# Performing backwards selection to find the best parameters for the logistic regression model
+model_full <- glm(diagnosis~.,
+                  family = "binomial",
+                  data = RiskFactor)
+
+model_min <- glm(diagnosis ~ weight,
+                 family = "binomial",
+                 data = RiskFactor)
+
+
+backwardsmodel <- stepAIC(model_full,
+                          direction = 'backward',
+                          scope = list(upper = model_full, 
+                                       lower = model_min))
+  
+
+summarybackward <- tidy(backwardsmodel)
+
+```
+
+```{r}
+# Add the odds ratio for the each variable to the summarybackward
+summarybackward <- summarybackward |>
+  mutate(OR = exp(estimate)) |>
+  relocate(OR, .after = term)
+
+
+```
+
+```{r}
+# Show the predicted variables found by the model
+predictor <- summarybackward |> 
+  dplyr::select(term) |>
+  slice(2:n()) |>
+  pull(term)
+
+
+```
+
+# Logistic regression model of the variables found from the backwards selection
+
+```{r}
+model_data <- diabetes_data |> 
+  filter(medication == 0) |> 
+  drop_na() |>
+  dplyr::select(diagnosis,tidyselect::any_of(predictor)) |> 
+  mutate(diagnosis = factor(diagnosis))
+
+```
+
+# Performing the logistic regression model
+
+```{r}
+model <- glm(diagnosis ~. ,
+             family = "binomial",
+             data = model_data)
+
+summary(model)
+```
+
+# Plot the most significant variable
+
+The logistics regression model for glycohemoglobin levels (Highest significant) and diabetes is plotted.
+
+```{r}
+LR_model <- diabetes_data |>
+   ggplot(aes(gh, diagnosis)) +
+   geom_point(alpha = 0.2) +
+   geom_smooth(method = "glm",
+               method.args = list(family = "binomial")) +
+   labs(title = "Logistic Regression Model",
+        x = "Glycohemoglobin concentration (%)",
+        y = "Probability of diabetes") +
+   theme_minimal()
+
+LR_model
+```
+
+# Save the plots in results folder
+
+```{r}
+ggsave(LR_model, 
+       filename = "../results/LR_model.png",
+       device = "png",
+       height = 15, width = 24, units = "cm")
+```
