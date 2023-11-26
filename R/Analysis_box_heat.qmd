@@ -8,14 +8,17 @@ editor: visual
 
 ## Analysis: Biomarker levels for D/M status
 
-```{r}
+### Loading libraries
 
+```{r}
 library('tidyverse')
 library('patchwork')
-library(ggplot2)
-library(scales)
+library('ggplot2')
+library('scales')
 
 ```
+
+### Loading data
 
 ```{r}
 #load augmented data
@@ -28,9 +31,9 @@ diabetes_data <- read_tsv(file = "../data/03_diabetes_data_augment.tsv",
 ```{r}
 
 p1 <- diabetes_data |> 
-      ggplot(aes(x = factor(dm_status), 
-                 y = albumin, 
-                 fill = factor(dm_status))) +
+      ggplot(mapping = aes(x = factor(dm_status), 
+                           y = albumin, 
+                           fill = factor(dm_status))) +
       geom_boxplot() +
       labs(
         fill = "Status",
@@ -47,9 +50,9 @@ p1 <- diabetes_data |>
 
 ```{r}
 p2 <- diabetes_data |> 
-      ggplot(aes(x = factor(dm_status), 
-                 y = bun, 
-                 fill = factor(dm_status))) +
+      ggplot(mapping = aes(x = factor(dm_status), 
+                           y = bun, 
+                           fill = factor(dm_status))) +
       geom_boxplot() +
       labs(
         fill = "Status",
@@ -67,9 +70,9 @@ p2 <- diabetes_data |>
 ```{r}
 
 p3 <- diabetes_data |> 
-      ggplot(aes(x = factor(dm_status), 
-                 y = creatinine, 
-                 fill = factor(dm_status))) +
+      ggplot(mapping = aes(x = factor(dm_status), 
+                           y = creatinine, 
+                           fill = factor(dm_status))) +
       geom_boxplot() +
       labs(
         fill = "Status",
@@ -86,9 +89,9 @@ p3 <- diabetes_data |>
 
 ```{r}
 p4 <- diabetes_data |> 
-      ggplot(aes(x = factor(dm_status), 
-                 y = gh, 
-                 fill = factor(dm_status))) +
+      ggplot(mapping = aes(x = factor(dm_status), 
+                           y = gh, 
+                           fill = factor(dm_status))) +
       geom_boxplot() +
       labs(
         fill = "Status",
@@ -131,9 +134,9 @@ biomark_box
 
 #standardizing and pivoting the physical attributes
 diabetes_standard <- diabetes_data |> 
-        mutate(across(c(weight,bmi,armc,waist,tri_skinfold,sub_skinfold,bfp,ci), 
+        mutate(across(c(weight, bmi, armc, waist, tri_skinfold, sub_skinfold, bfp, ci), 
                       scale)) |> 
-        pivot_longer(cols = c(weight,bmi,armc,waist,tri_skinfold,sub_skinfold,bfp,ci), 
+        pivot_longer(cols = c(weight, bmi, armc, waist, tri_skinfold, sub_skinfold, bfp, ci), 
                      names_to = "attribute", 
                      values_to = "value")
 
@@ -143,9 +146,9 @@ diabetes_standard <- diabetes_data |>
 ```{r}
 
 phys_heat <- diabetes_standard |> 
-    ggplot(aes(x = attribute, 
-               y = as.factor(dm_status), 
-               fill = value)) +
+    ggplot(mapping = aes(x = attribute, 
+                         y = as.factor(dm_status), 
+                         fill = value)) +
     geom_tile() +
     scale_fill_gradient2(midpoint = 0,
                          low = "blue",
