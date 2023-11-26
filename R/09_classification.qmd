@@ -1,0 +1,182 @@
+---
+title: "Logistic Regression Classification"
+format:
+  html:
+    embed-resources: true
+editor: visual
+---
+
+# Clear Environment
+
+```{r}
+rm(list = ls())
+```
+
+# Load libraries
+
+```{r}
+#| message: false
+library('tidyverse')
+library('tidymodels')
+```
+
+# Load data
+
+```{r}
+#| message: false
+diabetes_data <- read_tsv('../data/03_diabetes_data_augment.tsv',
+                          na = 'NA')
+```
+
+The model should predict a DM/pre-DM diagnosis based on the variables found in the logistic regression analysis.
+
+# Prepare data for model training
+
+```{r}
+model_data <- diabetes_data |> 
+  filter(medication == 0) |> 
+  drop_na() |> 
+  dplyr::select(diagnosis, weight, leg, waist, gh, creatinine) |> 
+  mutate(diagnosis = factor(diagnosis))
+
+```
+
+# Prepare training and testing data
+
+```{r}
+set.seed(42)
+
+#Split data for training (70%)/testing (30%)
+data_split <- model_data |> 
+  initial_split(prop = 0.7)
+
+data_train <- training(data_split)
+data_test <- testing(data_split)
+
+```
+
+# Set model specification
+
+```{r}
+logreg_spec <- logistic_reg() |> 
+  set_engine("glm") |> 
+  set_mode("classification")
+```
+
+# Train model
+
+```{r}
+logreg_fit <- logreg_spec |> 
+  fit(diagnosis ~ ., 
+      data = data_train)
+  
+```
+
+# Test model
+
+```{r}
+prediction <- data_test |> 
+  dplyr::select(diagnosis) |> 
+  bind_cols(logreg_fit |> 
+              predict(new_data = data_test))
+
+```
+
+# Make confusion matrix
+
+```{r}
+values <- prediction |> 
+  mutate(conf_value = case_when(diagnosis == 0 & .pred_class == 0 ~ '00',
+                                diagnosis == 0 & .pred_class == 1 ~ '01',
+                                diagnosis == 1 & .pred_class == 0 ~ '10',
+                                diagnosis == 1 & .pred_class == 1 ~ '11')) |> 
+  count(conf_value) |> 
+  pull(n)
+
+conf_data <- tibble(.rows = 4) |> 
+  mutate(truth = factor(c(0,0,1,1)),
+         pred = factor(c(0,1,0,1)),
+         n = values) 
+
+
+```
+
+# Plot confusion matrix
+
+```{r}
+#| message: false
+conf_plot <- conf_data |> 
+  ggplot(mapping = aes(x = truth,
+                       y = pred)) +
+  geom_tile(mapping = aes(fill = n),
+            show.legend = FALSE,
+            color = 'black',
+            linewidth = 0.3) +
+  scale_fill_gradient(low = 'beige',
+                       high = 'skyblue3') +
+  geom_text(mapping = aes(label = n)) +
+  theme_minimal() +
+  labs(title = 'Confusion matrix',
+         x = 'Truth',
+         y = 'Prediction') +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_discrete(expand = c(0,0)) +
+  coord_fixed() +
+  theme_bw(base_size = 14) +
+  theme(plot.title = element_text(hjust = 0.5)) 
+
+conf_plot
+
+ggsave(plot = conf_plot,
+       filename = '../results/09_classification_conf_matrix.png',
+       device = 'png')
+
+```
+
+# ROC curve
+
+```{r}
+# Calculate the class probabilities
+class_prob <- prediction |> 
+  bind_cols(logreg_fit |>  
+              predict(new_data = data_test, 
+                      type = "prob"))
+
+```
+
+```{r}
+#| message: false
+# ROC graph
+roc_plot <- class_prob |>  
+  roc_curve(truth = diagnosis, 
+            .pred_1,
+            event_level = 'second') |> 
+  ggplot(mapping = aes(x = 1-specificity,
+                       y = sensitivity)) +
+  geom_path() +
+  geom_abline(slope = 1,
+              linetype = 'dotted') +
+  coord_fixed() +
+  theme_minimal() +
+  labs(title = 'ROC curve',
+       x = 'False Positive Rate (1 - specificity)',
+       y = 'True Positive Rate (sensitivity)') +
+  theme_bw(base_size = 14) +
+  theme(plot.title = element_text(hjust = 0.5)) 
+
+roc_plot
+
+ggsave(plot = roc_plot,
+       filename = '../results/09_classification_ROC_curve.png',
+       device = 'png')
+
+```
+
+# AUC
+
+```{r}
+class_prob |> 
+  roc_auc(diagnosis,
+          .pred_1,
+          event_level = 'second')
+```

@@ -1,0 +1,118 @@
+---
+title: "PCA analysis"
+format:
+  html:
+    embed-resources: true
+editor: visual
+---
+
+# Clear Environment
+
+```{r}
+rm(list = ls())
+```
+
+# Load Libraries
+
+```{r}
+library('tidyverse')
+library('broom')
+library("ggthemes")
+```
+
+# Load data
+
+```{r}
+#| message: false
+diabetes_data <- read_tsv(file = "../data/03_diabetes_data_augment.tsv",
+                          na = "NA")
+```
+
+For PCA analysis we drop the observations that have NA values. We will use the observations that are not medicated, and use the anthropometric measures and biomarkers.
+
+```{r}
+model_data <- diabetes_data |> 
+  filter(medication == 0) |> 
+  dplyr::select(diagnosis, 
+         weight, 
+         height, 
+         leg, 
+         arml, 
+         armc,
+         waist,
+         tri_skinfold,
+         sub_skinfold,
+         gh,
+         albumin,
+         bun,
+         creatinine) |> 
+  mutate(diagnosis = factor(diagnosis)) |> 
+  drop_na()
+```
+
+# Do PCA
+
+```{r}
+pca_fit <- model_data |> 
+  dplyr::select(-diagnosis) |> 
+  dplyr::select(where(is.numeric)) |> 
+  scale() |> 
+  prcomp()
+```
+
+# Plot PCA
+
+```{r}
+#| message: false
+pca_plot <- pca_fit |> 
+  augment(model_data) |> 
+  arrange(diagnosis) |> 
+  ggplot(mapping = aes(x = .fittedPC1, 
+                       y = .fittedPC2,
+                       color = diagnosis)) +
+  geom_point(alpha = 0.8) + 
+  theme_minimal() +
+  scale_color_colorblind() +
+  labs(title = 'Data represented by the first two principal components',
+       x = 'Principal Component 1',
+       y = 'Principal Component 2',
+       color = 'Diagnosis') +
+  theme_bw(base_size = 14) +
+  theme(plot.title = element_text(hjust = 0.5),
+        legend.position = 'bottom') 
+
+pca_plot
+
+ggsave(plot = pca_plot,
+       filename = '../results/07_PCA_plot.png',
+       device = 'png')
+
+```
+
+# Variance explained by the principal components
+
+```{r}
+#| message: false
+pc_variance <- pca_fit |> 
+  tidy(matrix = 'eigenvalues') |> 
+  ggplot(mapping = aes(x = PC,
+                       y = percent)) +
+  geom_col(fill = 'deepskyblue3',
+           alpha = 0.7) +
+  theme_minimal() +
+  scale_x_continuous(breaks = 1:13) +
+  scale_y_continuous(limits = c(0,0.4),
+                     labels = scales::percent_format(),
+                     expand = c(0,0)) +
+  labs(title = 'Variance explained by each principal component',
+       x = 'Principal Component',
+       y = 'Variance explained (%)') +
+  theme_bw(base_size = 14) +
+  theme(plot.title = element_text(hjust = 0.5)) 
+
+pc_variance
+
+ggsave(plot = pc_variance,
+       filename = '../results/07_pc_variance.png',
+       device = 'png')
+```

@@ -1,8 +1,16 @@
 ---
 title: "01_load_data"
-format: html
+format:
+  html:
+    embed-resources: true
 editor: visual
 ---
+
+# Clear Environment
+
+```{r}
+rm(list = ls())
+```
 
 # Load libraries
 
@@ -31,14 +39,14 @@ write_tsv(x = raw_data,
 
 ```{r}
 
-#reading the data files into two seperate data frames to demonstrate joining later
+#Reading the data files into two seperate tibbles to demonstrate joining later
 meta_data <- read_tsv(file = "../data/_raw/nhgh.tsv",
                       col_select = c(1:5))
 
 measurements <- read_tsv(file = "../data/_raw/nhgh.tsv",
                          col_select = -c(2:5))
 
-#wrinting into two data files
+#Writing into two data files
 write_tsv(x = meta_data,
           file = "../data/01_nhgh_meta_data.tsv")
 

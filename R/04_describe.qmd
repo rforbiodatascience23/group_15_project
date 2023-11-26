@@ -1,0 +1,159 @@
+---
+title: "04_describe"
+format:
+  html:
+    embed-resources: true
+editor: visual
+---
+
+# Clear Environment
+
+```{r}
+rm(list = ls())
+```
+
+# Load libraries
+
+```{r}
+#| message: false
+library("tidyverse")
+library("ggthemes")
+```
+
+# Load data
+
+```{r}
+#| message: false
+diabetes_data <- read_tsv(file = '../data/03_diabetes_data_augment.tsv',
+                          na = 'NA')
+
+```
+
+# Observations and variables in the dataset
+
+There are 6795 observation distributed in 20 different variables
+
+```{r}
+diabetes_data |>
+  dim()
+```
+
+The variables have the different names
+
+```{r}
+diabetes_data |> 
+  colnames()
+```
+
+Distribution of diagnosis
+
+```{r}
+diabetes_data |>
+  count(dm_status)
+```
+
+# Gender distribution
+
+The gender distribution in the study population is evenly distributed with 3423 females and 3372 males.
+
+```{r}
+diabetes_data |>
+  count(sex)
+```
+
+# Age distribution plot
+
+A variable to consider here is the age, as the occurrence of observations with the age = 80 is around double as high as the next highest occurrence.
+
+```{r}
+age_dist <- diabetes_data |> 
+  ggplot(mapping = aes(x= age)) +
+  geom_histogram(color='blue',
+               fill='light blue',
+               binwidth = 1) +
+  labs(title = 'Age distribution of the study population',
+       x = 'Age',
+       y = 'Number of people') +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+# save plot to results 
+ggsave(age_dist, 
+       filename = '../results/04_age_dist.png',
+       device = "png",
+       height = 10, 
+       width = 20, 
+       units = "cm")
+
+age_dist
+
+```
+
+This might be because this value is set to be 80+ in the study, and therefore includes everyone that is 80 years or older.
+
+# BMI distribution of the study population
+
+```{r}
+bmi_dist <- diabetes_data |>
+  ggplot(aes(x = bmi)) +
+  annotate("rect", 
+           fill = "green", 
+           alpha = 0.4, 
+           xmin=18.5, 
+           xmax=24.9, 
+           ymin=0, 
+           ymax=+Inf) +
+  geom_histogram(color='darkblue', 
+                 fill='lightblue', 
+                 binwidth = 2) +
+  theme_minimal() +
+  labs(title = 'BMI distribution in the study population',
+       x = bquote('BMI'~(kg/m^2)),
+       y = 'Number of people') +
+  theme(plot.title = element_text(hjust = 0.5))
+  
+# save plot to results 
+ggsave(bmi_dist, 
+       filename = '../results/04_bmi_dist.png',
+       device = "png",
+       height = 10, 
+       width = 20, 
+       units = "cm")
+
+bmi_dist
+```
+
+We see a slightly overweight BMI average for the population of the study as the green area marks the normal BMI range.
+
+The BMI distribution for the study population based on the diabetes diagnosis for non-medicated people
+
+```{r}
+non_medicated_data <- diabetes_data |>
+  filter(medication == 0) |> 
+  mutate(diagnosis = factor(diagnosis))
+
+bmi_dist_diagnosed <- non_medicated_data |> 
+  ggplot(mapping = aes(x = diagnosis,
+                       y = bmi)) +
+  geom_boxplot(aes(colour = diagnosis)) +
+  theme_minimal() +
+  scale_color_colorblind() +
+  labs(title = 'BMI distribution in the study population',
+       x = 'Diabetes diagnosis',
+       y = bquote('BMI'~(kg/m^2)),
+       color = 'Diagnosis') +
+  theme(legend.position = 'bottom') +
+  theme(plot.title = element_text(hjust = 0.5))
+  
+# save plot to results 
+ggsave(bmi_dist_diagnosed, 
+       filename = '../results/04_bmi_dist_diagnosed.png',
+       device = "png",
+       height = 10, 
+       width = 20, 
+       units = "cm")
+
+bmi_dist_diagnosed
+```
+
+We see from the plot above that people diagnosed with DM or pre-DM generally have a slightly higher BMI average.

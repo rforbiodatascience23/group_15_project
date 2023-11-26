@@ -1,6 +1,8 @@
 ---
 title: "00_all"
-format: html
+format:
+  html:
+    embed-resources: true
 editor: visual
 ---
 
@@ -8,11 +10,24 @@ editor: visual
 
 ```{r}
 #| message: false
+#| results: hide
 rmarkdown::render(input = '01_load_data.qmd',
                   output_dir = '../results')
 rmarkdown::render(input = '02_clean_data.qmd',
                   output_dir = '../results')
-rmarkdown::render(input = '04_augment.qmd',
+rmarkdown::render(input = '03_augment.qmd',
                   output_dir = '../results')
-
+rmarkdown::render(input = '04_describe.qmd',
+                  output_dir = '../results')
+rmarkdown::render(input = '05_diabetes_income_age.qmd',
+                  output_dir = '../results')
+rmarkdown::render(input = '06_diagnosis_medication_effect.qmd',
+                  output_dir = '../results')
+rmarkdown::render(input = '07_PCA_analysis.qmd',
+                  output_dir = '../results')
+rmarkdown::render(input = '08_logistic_regression.qmd',
+                  output_dir = '../results')
+rmarkdown::render(input = '09_classification.qmd',
+                  output_dir = '../results')
+                  
 ```
