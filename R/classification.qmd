@@ -36,7 +36,7 @@ The model should predict a DM/pre-DM diagnosis based on the variables found in t
 model_data <- diabetes_data |> 
   filter(medication == 0) |> 
   drop_na() |> 
-  select(diagnosis, weight, leg, waist, gh, creatinine) |> 
+  dplyr::select(diagnosis, weight, leg, waist, gh, creatinine) |> 
   mutate(diagnosis = factor(diagnosis))
 
 ```
@@ -76,7 +76,7 @@ logreg_fit <- logreg_spec |>
 
 ```{r}
 prediction <- data_test |> 
-  select(diagnosis) |> 
+  dplyr::select(diagnosis) |> 
   bind_cols(logreg_fit |> 
               predict(new_data = data_test))
 
