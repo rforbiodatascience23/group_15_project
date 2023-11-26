@@ -36,7 +36,7 @@ The model should predict a DM/pre-DM diagnosis based on the variables found in t
 model_data <- diabetes_data |> 
   filter(medication == 0) |> 
   drop_na() |> 
-  select(diagnosis,height,armc,tri_skinfold,gh,creatinine,bmi,bfp) |> 
+  select(diagnosis, weight, leg, waist, gh, creatinine) |> 
   mutate(diagnosis = factor(diagnosis))
 
 ```
@@ -111,7 +111,7 @@ conf_plot <- conf_data |>
   geom_tile(mapping = aes(fill = n),
             show.legend = FALSE,
             color = 'black',
-            size = 0.3) +
+            linewidth = 0.3) +
   scale_fill_gradient(low = 'beige',
                        high = 'skyblue3') +
   geom_text(mapping = aes(label = n)) +
