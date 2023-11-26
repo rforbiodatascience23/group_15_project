@@ -33,7 +33,7 @@ For PCA analysis we drop the observations that have NA values. We will use the o
 ```{r}
 model_data <- diabetes_data |> 
   filter(medication == 0) |> 
-  select(diagnosis, 
+  dplyr::select(diagnosis, 
          weight, 
          height, 
          leg, 
@@ -54,8 +54,8 @@ model_data <- diabetes_data |>
 
 ```{r}
 pca_fit <- model_data |> 
-  select(-diagnosis) |> 
-  select(where(is.numeric)) |> 
+  dplyr::select(-diagnosis) |> 
+  dplyr::select(where(is.numeric)) |> 
   scale() |> 
   prcomp()
 ```
