@@ -22,9 +22,6 @@ million deaths each year are directly attributed to diabetes.
 Kidney disease?
 
 AIM of the project
-```{r, echo = FALSE, out.width = "800px"}
-#knitr::include_graphics("../results/04_.png")
-```
 
 
 ## Method
@@ -76,6 +73,7 @@ knitr::include_graphics("../results/04_bmi_dist_diagnosed.png")
 ## PCA
 
 ## Logistic regression model
+
 
 ## Classification
 
