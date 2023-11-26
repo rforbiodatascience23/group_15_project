@@ -75,17 +75,16 @@ knitr::include_graphics("../results/04_bmi_dist_diagnosed.png")
 
 ::: {.column width="60%"}
 ::: {.nonincremental}
+- Data
+  - Non-medicated individuals
 - Classes not seperated
 :::
 
 :::
 
-::: {.column width="40%"}
-Right column
+
 ![](../results/07_PCA_plot.png){.absolute top=0 right=0 width="450" height="320"}
 ![](../results/07_pc_variance.png){.absolute top=350 right=0 width="450" height="320"}
-
-:::
 
 ::::
 
@@ -95,7 +94,27 @@ Right column
 ## Logistic regression model
 
 
-## Classification
+## Classification 
+:::: {.columns}
+
+::: {.column width="60%"}
+::: {.nonincremental}
+- Model based on parameters found by LR
+- Data
+  - Non-medicated individuals
+- Not many predicted as 1
+- AUC is low
+:::
+
+:::
+
+
+
+![](../results/09_classification_conf_matrix.png){.absolute top=350 left=0 width="500" height="300"}
+![](../results/09_classification_ROC_curve.png){.absolute top=0 right=0 width="500" height="370"}
+
+::::
+
 
 ## Discussion
 
