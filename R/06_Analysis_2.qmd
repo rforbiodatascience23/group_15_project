@@ -17,13 +17,15 @@ rm(list = ls())
 ```{r}
 library("tidyverse")
 library("patchwork")
+library("MASS")
 ```
 
 # Load data
 
 ```{r}
 #| message: false
-diabetes_data <- read_tsv(file = "../data/03_diabetes_data_augment.tsv")
+diabetes_data <- read_tsv(file = "../data/03_diabetes_data_augment.tsv",
+                          na = "NA")
 ```
 
 # Logistic regression model
@@ -61,14 +63,15 @@ RiskFactor <- RiskFactor |>
 ```
 
 ```{r}
+#| results: false
 # Performing backwards selection to find the best parameters for the logistic regression model
-model_full<-glm(diagnosis~.,
-                family = "binomial",
-                data = RiskFactor)
+model_full <- glm(diagnosis~.,
+                  family = "binomial",
+                  data = RiskFactor)
 
-model_min<-glm(diagnosis ~ weight,
-               family = "binomial",
-                data = RiskFactor)
+model_min <- glm(diagnosis ~ weight,
+                 family = "binomial",
+                 data = RiskFactor)
 
 
 backwardsmodel <- stepAIC(model_full,
@@ -157,4 +160,8 @@ ggsave(LR_model,
        filename = "../Results/LR_model.png",
        device = "png",
        height = 15, width = 24, units = "cm")
+```
+
+```{r}
+detach("MASS")
 ```
