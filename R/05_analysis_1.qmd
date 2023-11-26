@@ -1,134 +1,151 @@
 ---
+title: "Data Analysis I: Diabetes vs Income and Age"
 format:
   html:
     embed-resources: true
+editor: visual
 ---
+
+# Clear environment
 ```{r}
-    rm(list = ls())
+rm(list = ls())
 ```
 
+# Load libraries
 ```{r}
 #| message: false
-    library(dplyr)
-    library("tidyverse")
+library("tidyverse")
 ```
 
+# Load data
 ```{r}
 #| message: false
-diabetes_data <- read_tsv(file = "../data/04_diabetes_data_augment.tsv", na = 'NA')
+diabetes_data <- read_tsv(file = "../data/03_diabetes_data_augment.tsv",
+                          na = 'NA')
 ```
 
+# This visualisation aims to investigate whether family income (and therefore, whealthy lifestyle) is a factor or not on diabetes manifestation.
 ```{r}
-plot1 <- ggplot(diabetes_data |>
+plot1_data <- diabetes_data |>
                   mutate(income = factor(income, levels = c('[0,5000)','[5000,10000)','[10000,15000)','[15000,20000)','[20000,25000)',
-                          '[25000,35000)','[35000,45000)','[45000,55000)','[55000,65000)','[65000,75000)','[75000,100000)'))) |>
-                  filter(!is.na(income)) |>
+                        '[25000,35000)','[35000,45000)','[45000,55000)','[55000,65000)','[65000,75000)','[75000,100000)',
+                        '>= 100000'))) |>
+                  drop_na() |>
                   group_by(income) |>
-                  summarize(percentage = sum(diagnosis == 1)*100 / n()),
-                aes(x = income,
-                    y = percentage,
-                    alpha = percentage)
+                  summarize(percentage = sum(diagnosis == 1)*100 / n())
+
+
+plot1 <- plot1_data |>
+        ggplot(mapping = aes(x = income,
+                            y = percentage)
         ) +
         geom_bar(
-          stat="identity",
-          color="black",
-          fill='wheat',
-          show.legend=FALSE
+          stat = "identity",
+          color = "black",
+          fill = 'wheat',
+          alpha = 0.5
         ) +
-        scale_alpha_continuous(range = c(0.2, 0.8)) +
+        theme_minimal() +
         theme(
           text = element_text(size=10),
-          axis.text.x = element_text(angle = 15, vjust = 1, hjust=1)
+          axis.text.x = element_text(angle = 15,
+                                     vjust = 1,
+                                     hjust = 1),
+          plot.title = element_text(hjust = 0.5)
         ) +
-        coord_cartesian(ylim = c(0, 100)) +
+        coord_cartesian(ylim = c(0, 25)) +
         labs(
-          title = "Diabete-diagnosed people vs Family income classes",
+          title = "Diabetes diagnosed people vs Family income classes",
           x = "Income classes",
-          y = "% of diabete-diagnosed",
-          caption = "To be read: within the class of income X, Y% of individuals got diagnosed with diabete."
+          y = "% of diabetes diagnosed"
         )
 
+ggsave(plot1, 
+       filename = "../results/05_bar_income.png",
+       device = "png"
+       )
 
 plot1
 ```
-```{r}
-plot1 <- ggplot(diabetes_data |>
-dplyr::select(income,
-diagnosis) |>
-drop_na() |>
-group_by(income) |>
-summarize(percentage = sum(diagnosis == 1)*100 / n()),
-                aes(x = income,
-                    y = percentage,
-                    alpha = percentage)
-        ) +
-        geom_bar(
-          stat="identity",
-          color="black",
-          fill='wheat',
-          show.legend=FALSE
-        ) +
-        scale_alpha_continuous(range = c(0.2, 0.8)) +
-        theme(
-          text = element_text(size=10),
-          axis.text.x = element_text(angle = 15, vjust = 1, hjust=1)
-        ) +
-        coord_cartesian(ylim = c(0, 100)) +
-        labs(
-          title = "Diabete-diagnosed people vs Family income classes",
-          x = "Income classes",
-          y = "% of diabete-diagnosed",
-          caption = "To be read: within the class of income X, Y% of individuals got diagnosed with diabete."
-        )
-
-
-plot1
-```
-
-
+# This visualisation aims to investigate whether family income might be a determinant factor on the choice to pursue medications given being diagnosed with diabetes.
 ```{r}
 plot2_data <- diabetes_data |>
                   mutate(income = factor(income, levels = c('[0,5000)','[5000,10000)','[10000,15000)','[15000,20000)','[20000,25000)',
-                        '[25000,35000)','[35000,45000)','[45000,55000)','[55000,65000)','[65000,75000)','[75000,100000)'))) |>
-                  filter(!is.na(income), diagnosis==1) |>
+                        '[25000,35000)','[35000,45000)','[45000,55000)','[55000,65000)','[65000,75000)','[75000,100000)',
+                        '>= 100000'))) |>
+                  drop_na() |>
+                  filter(diagnosis==1) |>
                   group_by(income) |>
                   summarize(percentage = sum(medication == 1)*100 / n())
 
-plot2 <- ggplot(plot2_data, aes(x = income, y = percentage, alpha = percentage)) +
-  geom_bar(stat="identity", color="black", fill='wheat', show.legend=FALSE) +
-  scale_alpha_continuous(range = c(0.2, 0.8)) +
-  theme(text = element_text(size=10), axis.text.x = element_text(angle = 15, vjust = 1, hjust=1)) +
-  coord_cartesian(ylim = c(0, 100)) +
-  labs(
-    title = "Medicated people vs Family income classes",
-    x = "Income classes",
-    y = "% of medicated people",
-    caption = "To be read: within the class of income X, Y% of (diabete-diagnosed) individuals got medicated."
-  )
+plot2 <- plot2_data |>
+          ggplot(mapping = aes(x = income,
+                              y = percentage)
+          ) +
+          geom_bar(
+            stat = "identity",
+            color = "black",
+            fill = 'wheat',
+            alpha = 0.5
+          ) +
+          theme_minimal() +
+          theme(
+            text = element_text(size=10),
+            axis.text.x = element_text(angle = 15,
+                                       vjust = 1,
+                                       hjust = 1),
+            plot.title = element_text(hjust = 0.5)
+          ) +
+          coord_cartesian(ylim = c(0, 85)) +
+          labs(
+            title = "Medicated people vs Family income classes",
+            x = "Income classes",
+            y = "% of medicated people"
+          )
+
+ggsave(plot2, 
+       filename = "../results/05_bar_med.png",
+       device = "png"
+       )
 
 plot2
 ```
-
+# This visualisation aims to investigate how the age can be a factor to take into account within being susceptible to diabetes.
 ```{r}
 plot3_data <- diabetes_data |>
                   arrange(age) |>
                   group_by(age) |>
                   summarize(percentage = sum(diagnosis == 1)*100 / n())
 
-plot3 <- ggplot(plot3_data, aes(x = age, y = percentage, alpha = percentage)) +
-  geom_bar(stat="identity", color="black", fill="wheat", show.legend=FALSE) +
-  scale_alpha_continuous(range = c(0.2, 0.8)) +
-  scale_x_continuous(breaks = unique(diabetes_data[["age"]])[unique(diabetes_data[["age"]]) %% 2 == 0]) +
-  theme(text = element_text(size=10)) +
-  coord_cartesian(ylim = c(0, 100)) +
-  labs(
-    title = "Diagnosed people vs Age",
-    x = "Age",
-    y = "% of diabete-diagnoses",
-    caption = "To be read: within the people of age X, Y% of individuals got diagnosed with diabete."
-  )
+plot3 <- plot3_data |>
+          ggplot(mapping = aes(x = age,
+                              y = percentage)
+                ) +
+                geom_bar(
+                  stat = "identity", 
+                  color = "black",
+                  fill = "wheat",
+                  alpha = 0.5
+                ) +
+                scale_x_continuous(
+                  breaks = seq(12, 80, 2)
+                ) +
+                theme_minimal() +
+                theme(
+                  text = element_text(size = 10),
+                  plot.title = element_text(hjust = 0.5)
+                ) +
+                coord_cartesian(ylim = c(0, 60)) +
+                labs(
+                  title = "Diagnosed people vs Age",
+                  x = "Age",
+                  y = "% of diabetes diagnosed"
+                )
 
+ggsave(plot3, 
+       filename = "../results/05_bar_age.png",
+       device = "png"
+       )
 
 plot3
 ```
-
