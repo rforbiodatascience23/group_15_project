@@ -15,6 +15,7 @@ rm(list = ls())
 # Load Libraries
 
 ```{r}
+#| message: false
 library("tidyverse")
 library("patchwork")
 library("MASS")
@@ -58,12 +59,11 @@ RiskFactor <- diabetes_data |>
 ```{r}
 #Replace the NA with 0 in the riskfactors
 RiskFactor <- RiskFactor |>
-  mutate_all(~if_else(is.na(.), 0, .))
+  drop_na()
 
 ```
 
 ```{r}
-#| results: false
 # Performing backwards selection to find the best parameters for the logistic regression model
 model_full <- glm(diagnosis~.,
                   family = "binomial",
@@ -90,7 +90,6 @@ summarybackward <- summarybackward |>
   mutate(OR = exp(estimate)) |>
   relocate(OR, .after = term)
 
-summarybackward
 
 ```
 
@@ -98,30 +97,20 @@ summarybackward
 # Show the predicted variables found by the model
 predictor <- summarybackward |> 
   dplyr::select(term) |>
-  slice(2:n())
+  slice(2:n()) |>
+  pull(term)
 
-predictor
+
 ```
 
 # Logistic regression model of the variables found from the backwards selection
 
 ```{r}
-
 model_data <- diabetes_data |> 
   filter(medication == 0) |> 
-  drop_na() |> 
-  dplyr::select(diagnosis,
-                weight,
-                leg,
-                waist,
-                tri_skinfold,
-                sub_skinfold,
-                gh,
-                albumin,
-                bun,
-                creatinine) |> 
+  drop_na() |>
+  dplyr::select(diagnosis,tidyselect::any_of(predictor)) |> 
   mutate(diagnosis = factor(diagnosis))
-
 
 ```
 
@@ -157,11 +146,7 @@ LR_model
 
 ```{r}
 ggsave(LR_model, 
-       filename = "../Results/LR_model.png",
+       filename = "../results/LR_model.png",
        device = "png",
        height = 15, width = 24, units = "cm")
-```
-
-```{r}
-detach("MASS")
 ```
