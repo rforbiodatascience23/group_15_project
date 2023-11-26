@@ -7,6 +7,11 @@ editor: visual
 ---
 
 ## Analysis: Biomarker levels for D/M status
+### Clear Environment
+
+```{r}
+rm(list = ls())
+```
 
 
 ### Loading libraries
@@ -30,8 +35,6 @@ diabetes_data <- read_tsv(file = "../data/03_diabetes_data_augment.tsv",
 ```
 
 ```{r}
-
-
 p1 <- diabetes_data |> 
       ggplot(mapping = aes(x = factor(dm_status), 
                            y = albumin, 
@@ -109,19 +112,18 @@ p4 <- diabetes_data |>
 
 ```{r}
 #| message: false
-
 biomark_box <- p1 + p2 + p3 + p4 + 
   plot_layout(guides = 'collect',
               ncol = 2,
               ) +
-
-  plot_annotation(title = 'Biomarker levels for the different D/M statuses') +
+  plot_annotation(title = 'Biomarker levels for the different D/M statuses',
+                  theme = theme(plot.title = element_text(hjust = 0.5))) +
   theme(panel.background = element_rect(fill = "white", 
-                                        color = "white"))
+                                        color = "white")) 
 
 
 ggsave(biomark_box, 
-       filename = "../Results/biomark_box.png",
+       filename = "../results/06_biomark_box.png",
        device = "png",
        height = 20, 
        width = 32, 
@@ -161,8 +163,7 @@ phys_heat <- diabetes_standard |>
          y = "D/M status",
          fill = "Value") + 
     theme_minimal() +
-    theme(panel.background = element_rect(fill = "white", 
-                                         color = "white"))
+    theme(plot.title = element_text(hjust = 0.5)) 
 
 
 #1: Undiagnosed
@@ -170,7 +171,7 @@ phys_heat <- diabetes_standard |>
 #3: Diagnosed, med
 
 ggsave(phys_heat, 
-       filename = "../Results/phys_heat.png",
+       filename = "../results/06_phys_heat.png",
        device = "png",
        height = 15, 
        width = 24, 

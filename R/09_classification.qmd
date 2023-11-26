@@ -6,7 +6,7 @@ format:
 editor: visual
 ---
 
-# Clear Workspace
+# Clear Environment
 
 ```{r}
 rm(list = ls())
@@ -128,7 +128,7 @@ conf_plot <- conf_data |>
 conf_plot
 
 ggsave(plot = conf_plot,
-       filename = '../results/classification_conf_matrix.png',
+       filename = '../results/09_classification_conf_matrix.png',
        device = 'png')
 
 ```
@@ -167,7 +167,7 @@ roc_plot <- class_prob |>
 roc_plot
 
 ggsave(plot = roc_plot,
-       filename = '../results/classification_ROC_curve.png',
+       filename = '../results/09_classification_ROC_curve.png',
        device = 'png')
 
 ```

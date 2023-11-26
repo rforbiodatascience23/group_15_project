@@ -6,7 +6,7 @@ format:
 editor: visual
 ---
 
-# Clear Workspace
+# Clear Environment
 
 ```{r}
 rm(list = ls())
@@ -84,7 +84,7 @@ pca_plot <- pca_fit |>
 pca_plot
 
 ggsave(plot = pca_plot,
-       filename = '../results/PCA_plot.png',
+       filename = '../results/07_PCA_plot.png',
        device = 'png')
 
 ```
@@ -113,6 +113,6 @@ pc_variance <- pca_fit |>
 pc_variance
 
 ggsave(plot = pc_variance,
-       filename = '../results/pc_variance.png',
+       filename = '../results/07_pc_variance.png',
        device = 'png')
 ```

@@ -6,7 +6,7 @@ format:
 editor: visual
 ---
 
-# Clear Workspace
+# Clear Environment
 
 ```{r}
 rm(list = ls())
@@ -79,9 +79,11 @@ age_dist <- diabetes_data |>
 
 # save plot to results 
 ggsave(age_dist, 
-       filename = '../results/04_key_plot_1.png',
+       filename = '../results/04_age_dist.png',
        device = "png",
-       height = 5, width = 8, units = "cm")
+       height = 10, 
+       width = 20, 
+       units = "cm")
 
 age_dist
 
@@ -112,9 +114,11 @@ bmi_dist <- diabetes_data |>
   
 # save plot to results 
 ggsave(bmi_dist, 
-       filename = '../results/04_key_plot_2.png',
+       filename = '../results/04_bmi_dist.png',
        device = "png",
-       height = 5, width = 8, units = "cm")
+       height = 10, 
+       width = 20, 
+       units = "cm")
 
 bmi_dist
 ```
@@ -143,9 +147,11 @@ bmi_dist_diagnosed <- non_medicated_data |>
   
 # save plot to results 
 ggsave(bmi_dist_diagnosed, 
-       filename = '../results/04_key_plot_3.png',
+       filename = '../results/04_bmi_dist_diagnosed.png',
        device = "png",
-       height = 5, width = 8, units = "cm")
+       height = 10, 
+       width = 20, 
+       units = "cm")
 
 bmi_dist_diagnosed
 ```

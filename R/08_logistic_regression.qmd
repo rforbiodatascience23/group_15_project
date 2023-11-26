@@ -6,7 +6,7 @@ format:
 editor: visual
 ---
 
-# Clear Workspace
+# Clear Environment
 
 ```{r}
 rm(list = ls())
@@ -130,14 +130,15 @@ The logistics regression model for glycohemoglobin levels (Highest significant) 
 
 ```{r}
 LR_model <- diabetes_data |>
-   ggplot(aes(gh, diagnosis)) +
+   ggplot(mapping = aes(gh, diagnosis)) +
    geom_point(alpha = 0.2) +
    geom_smooth(method = "glm",
                method.args = list(family = "binomial")) +
    labs(title = "Logistic Regression Model",
         x = "Glycohemoglobin concentration (%)",
         y = "Probability of diabetes") +
-   theme_minimal()
+   theme_minimal() +
+   theme(plot.title = element_text(hjust = 0.5)) 
 
 LR_model
 ```
@@ -146,7 +147,7 @@ LR_model
 
 ```{r}
 ggsave(LR_model, 
-       filename = "../results/LR_model.png",
+       filename = "../results/08_LR_model.png",
        device = "png",
        height = 15, width = 24, units = "cm")
 ```
