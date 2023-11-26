@@ -75,6 +75,7 @@ age_dist <- diabetes_data |>
        x = 'Age',
        y = 'Number of people') +
   theme_minimal() +
+  theme_bw(base_size = 14) +
   theme(plot.title = element_text(hjust = 0.5))
 
 # save plot to results 
@@ -107,6 +108,7 @@ bmi_dist <- diabetes_data |>
                  fill='lightblue', 
                  binwidth = 2) +
   theme_minimal() +
+  theme_bw(base_size = 14) +
   labs(title = 'BMI distribution in the study population',
        x = bquote('BMI'~(kg/m^2)),
        y = 'Number of people') +
@@ -137,6 +139,7 @@ bmi_dist_diagnosed <- non_medicated_data |>
                        y = bmi)) +
   geom_boxplot(aes(colour = diagnosis)) +
   theme_minimal() +
+  theme_bw(base_size = 14) +
   scale_color_colorblind() +
   labs(title = 'BMI distribution in the study population',
        x = 'Diabetes diagnosis',

@@ -34,6 +34,36 @@ Data Wrangling
 Added
 
 ## Descriptive analysis
+<div style="display: flex; flex-wrap: wrap;">
+
+<!-- Upper Left: Text -->
+<div style="flex: 50%; box-sizing: border-box; padding: 10px;">
+Observations: 6795<br>
+Variables (augmented): 26<br>
+Diagnosed: 914<br>
+Medicated: 607<br>
+</div>
+
+<!-- Upper Right: Plot 2 -->
+<div style="flex: 50%; box-sizing: border-box; padding: 10px;">
+```{r bmi-dist-plot, echo=FALSE, out.width='100%'}
+knitr::include_graphics("../results/04_bmi_dist.png")
+```
+</div>
+
+<!-- Lower Left: Plot 1 -->
+<div style="flex: 50%; box-sizing: border-box; padding: 10px;">
+```{r age-dist-plot, echo=FALSE, out.width='100%'}
+knitr::include_graphics("../results/04_age_dist.png")
+```
+</div>
+
+<!-- Lower Right: Plot 3 -->
+<div style="flex: 50%; box-sizing: border-box; padding: 10px;">
+```{r bmi-dist-diagnosed-plot, echo=FALSE, out.width='100%'}
+knitr::include_graphics("../results/04_bmi_dist_diagnosed.png")
+```
+</div>
 
 ## Income vs. medication
 
@@ -53,10 +83,55 @@ knitr::include_graphics("../results/06_phys_heat.png")
 1: Undiagnosed, 2: Diagnosed, unmedicated, 3: Diagnosed, medicated
 :::
 
-## PCA
+## PCA Analysis
+:::: {.columns}
+
+::: {.column width="60%"}
+::: {.nonincremental}
+- Data
+  - Non-medicated individuals
+- Classes not seperated
+:::
+
+:::
+
+
+![](../results/07_PCA_plot.png){.absolute top=0 right=0 width="450" height="320"}
+![](../results/07_pc_variance.png){.absolute top=350 right=0 width="450" height="320"}
+
+::::
+
+
+
 
 ## Logistic regression model
 
-## Classification
+
+## Classification 
+:::: {.columns}
+
+::: {.column width="60%"}
+::: {.nonincremental}
+- Model based on parameters found by LR
+- Data
+  - Non-medicated individuals
+- Not many predicted as 1
+- AUC is low
+:::
+
+:::
+
+
+
+![](../results/09_classification_conf_matrix.png){.absolute top=350 left=0 width="500" height="300"}
+![](../results/09_classification_ROC_curve.png){.absolute top=0 right=0 width="500" height="370"}
+
+::::
+
 
 ## Discussion
+
+
+
+
+
