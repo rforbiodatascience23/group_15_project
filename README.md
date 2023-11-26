@@ -1,5 +1,8 @@
 # Group_15_project
 
+## Project Contributers
+s204635 - PernilleTJensen, s204513 - katmeld, s204538 - KristineRosted,	s224180 - margretheblyso,	s222721 - EnricoL222721
+
 ## Description:
 
 Diabetes Mellitus is a chronic disease that occurs either when the pancreas fails to produce sufficient amount of insulin or when the body cannot effectively utilize the insulin it generates. It is characterized by elevated levels of blood glucose, leading to progressive damage to critical organs such as the heart, blood vessels, eyes, nerves and kidneys. Globally, more than 422 million people have diabetes and 1.5 million deaths each year are directly attributed to diabetes. Access to affordable treatment, particularly insulin, is crucial for the survival of the people living with diabetes [1].
