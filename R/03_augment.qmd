@@ -6,6 +6,13 @@ format:
 editor: visual
 ---
 
+# Load libraries
+
+```{r}
+library("tidyverse")
+```
+
+
 # Load data
 
 ```{r}
