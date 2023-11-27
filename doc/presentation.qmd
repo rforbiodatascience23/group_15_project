@@ -238,17 +238,18 @@ auc_value <- read_tsv(file = '../results/auc_value.tsv') |>
 
 
 ## Discussion
+-  Income classes and medication.
+-  Medication effect.
 -  Relation between anthropocentric- and biomarker measurements.
 -  Classification and PCA: No clear relation.
 -  Confusion matrix: Low prediction for diabetes.
 -  Uneven distribution between diabetic and non-diabetic.
     -  Improvement: Larger group of diabetic.
 
--  Income classes and medication.
-
 
 Conclusion:
-Not any clear relation for diabetes.
+- Medication showed effect.
+- Modelling: No conclusion.
 
 
 
