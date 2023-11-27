@@ -48,7 +48,7 @@ plot1 <- plot1_data |>
         ) +
         theme_minimal() +
         theme(
-          text = element_text(size=5),
+          text = element_text(size=5.3),
           axis.text.x = element_text(angle = 15,
                                      vjust = 1,
                                      hjust = 1),
@@ -89,7 +89,7 @@ plot2 <- plot2_data |>
           ) +
           theme_minimal() +
           theme(
-            text = element_text(size=5),
+            text = element_text(size=5.3),
             axis.text.x = element_text(angle = 15,
                                        vjust = 1,
                                        hjust = 1),
@@ -117,7 +117,7 @@ ggsave(combined_plot,
        filename = "../results/05_bar_income.png",
        device = "png",
        width = 960,
-       height = 880,
+       height = 1080,
        units = "px"
        )
 
@@ -145,7 +145,7 @@ plot3 <- plot3_data |>
                 ) +
                 theme_minimal() +
                 theme(
-                  text = element_text(size = 5),
+                  text = element_text(size = 5.3),
                   plot.title = element_text(hjust = 0.5),
                   plot.background = element_rect(fill = "white"),
                   panel.background = element_rect(fill = "white")
@@ -161,7 +161,7 @@ ggsave(plot3,
        filename = "../results/05_bar_age.png",
        device = "png",
        width = 960,
-       height = 880,
+       height = 1080,
        units = "px"
        )
 
