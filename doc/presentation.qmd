@@ -105,8 +105,8 @@ knitr::include_graphics("../results/06_phys_heat.png")
 :::
 
 
-![](../results/07_PCA_plot.png){.absolute top=0 width=50% right=0}
-![](../results/07_pc_variance.png){.absolute bottom=0 width=50% right=0}
+![](../results/07_PCA_plot.png){.absolute top=0 width=43% right=0}
+![](../results/07_pc_variance.png){.absolute bottom=0 width=43% right=0}
 
 ::::
 
@@ -153,8 +153,8 @@ auc_value <- read_tsv(file = '../results/auc_value.tsv') |>
 
 :::
 
-![](../results/09_classification_conf_matrix.png){.absolute top=0 width=50% right=0}
-![](../results/09_classification_ROC_curve.png){.absolute bottom=0 width=50% right=0}
+![](../results/09_classification_conf_matrix.png){.absolute top=0 width=43% right=0}
+![](../results/09_classification_ROC_curve.png){.absolute bottom=0 width=43% right=0}
 
 ::::
 
