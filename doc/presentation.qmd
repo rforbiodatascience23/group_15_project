@@ -57,9 +57,23 @@ Medicated: 607<br>
 ![](../results/04_bmi_dist_diagnosed.png){.absolute bottom=0 right=0 width="500" height="330"}
 :::
 
-
-
-## Income vs. medication
+## Data Visualization: Diabetes vs Income & Age
+<div style="font-size: 0.8em">
+Some amount of data visualization can be very useful to better understand our data and the phenomena underlying the diabetes disease.
+<div>
+<!-- Left: Plot 1 and 2 -->
+<div style="display: flex;">
+<div style="flex: 1;">
+```{r diabetes-vs-income, echo=FALSE, out.width='100%'}
+knitr::include_graphics("../results/05_bar_income.png")
+```
+</div>
+<!-- Right: Plot 3 -->
+<div style="flex: 1">
+```{r diabetes-vs-age, echo=FALSE, out.width='100%'}
+knitr::include_graphics("../results/05_bar_age.png")
+```
+</div></div>
 
 ## Biomarkers and diagnosis/medication status
 
