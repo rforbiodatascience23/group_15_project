@@ -8,6 +8,10 @@ format:
       
 author: "Katrine Meldgård, Margrethe Bøe Lysø, Kristine Rosted Petersen, Enrico Leonardi and Pernille Jensen"
 ---
+```{r}
+library('tidyverse')
+```
+
 
 ## Introduction {.smaller}
 #### NHANES glycohemoglobin data
@@ -213,9 +217,12 @@ knitr::include_graphics("../results/08_LR_model.png")
 :::: {.columns}
 ```{r}
 #| message: false
-library('tidyverse')
 auc_value <- read_tsv(file = '../results/auc_value.tsv') |>
   pull(.estimate)
+
+
+value <- obs |>
+  nth()
 ```
 
 

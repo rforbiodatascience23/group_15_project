@@ -184,7 +184,6 @@ auc <- class_prob |>
           event_level = 'second') |>
   dplyr::select(.metric, .estimate)
 
-
 ```
 
 # Save important variables
