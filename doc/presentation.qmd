@@ -190,9 +190,6 @@ knitr::include_graphics("../results/08_LR_model.png")
 auc_value <- read_tsv(file = '../results/auc_value.tsv') |>
   pull(.estimate)
 
-
-value <- obs |>
-  nth()
 ```
 
 
@@ -214,18 +211,19 @@ value <- obs |>
 ::::
 
 
-## Discussion
+## Discussion {.smaller}
 -  Income classes and medication.
 -  Medication effect.
 -  Relation between anthropocentric- and biomarker measurements.
 -  Classification and PCA: No clear relation.
 -  Confusion matrix: Low prediction for diabetes.
 -  Uneven distribution between diabetic and non-diabetic.
-    -  Improvement: Larger group of diabetic.
+    -  Improvement: Larger group of diabetic.\
+  \
 
 
-Conclusion:
-- Medication showed effect.
+### Conclusion:\
+- Medication showed effect.\
 - Modelling: No conclusion.
 
 

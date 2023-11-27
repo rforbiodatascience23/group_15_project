@@ -370,9 +370,13 @@ library(&quot;ggthemes&quot;)</code></pre>
 <div id="observations-and-variables-in-the-dataset" class="section level1">
 <h1>Observations and variables in the dataset</h1>
 <p>There are 6795 observation distributed in 20 different variables</p>
-<pre class="r"><code>diabetes_data |&gt;
-  dim()</code></pre>
-<pre><code>[1] 6795   26</code></pre>
+<pre class="r"><code> obs_and_variables &lt;- diabetes_data |&gt;
+  dim() |&gt;
+  tibble()
+
+ 
+obs_and_variables |&gt;
+  write_tsv(&#39;../results/04_obs_and_variables.tsv&#39;)</code></pre>
 <p>The variables have the different names</p>
 <pre class="r"><code>diabetes_data |&gt; 
   colnames()</code></pre>
@@ -383,14 +387,11 @@ library(&quot;ggthemes&quot;)</code></pre>
 [21] &quot;creatinine&quot;   &quot;bin_sex&quot;      &quot;bfp&quot;          &quot;waist_m&quot;      &quot;height_m&quot;    
 [26] &quot;ci&quot;          </code></pre>
 <p>Distribution of diagnosis</p>
-<pre class="r"><code>diabetes_data |&gt;
-  count(dm_status)</code></pre>
-<pre><code># A tibble: 3 × 2
-  dm_status     n
-      &lt;dbl&gt; &lt;int&gt;
-1         1  5881
-2         2   307
-3         3   607</code></pre>
+<pre class="r"><code>diagnosed_and_medicated &lt;- diabetes_data |&gt;
+  count(dm_status) 
+  
+diagnosed_and_medicated |&gt;
+  write_tsv(&#39;../results/04_diagnosed_and_medicated.tsv&#39;)</code></pre>
 </div>
 <div id="gender-distribution" class="section level1">
 <h1>Gender distribution</h1>
