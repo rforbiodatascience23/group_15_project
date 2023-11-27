@@ -40,66 +40,18 @@ library('tidyverse')
 ## Methods
 :::: {.columns}
 ::: {.column width="50%"}
-<div style="font-size: 0.7em">
-- <strong>Raw data</strong>: 6795 observations with 20 variables.
-- <strong>01_load_data</strong>: Data has been loaded and splitted in metadata and measurements.
-- <strong>02_clean_data</strong> (Data Wrangling): age values converted to integers, column names replaced with more meaningful names, unusable values set to NA and the data sets have been re-joined into one.
-- <strong>03_augment</strong>: gender information converted to 0-1; conversions of units and introduction of 'dm_status' column.
+<div style="font-size: 0.8em">
+- <strong>Raw data</strong>:<br />6795 observations with 20 variables.<br />
+- <strong>01_load_data</strong>:<br />Data has been loaded and splitted in metadata and measurements.<br />
+- <strong>02_clean_data</strong> (Data Wrangling):<br />Age values converted to integers, column names replaced with more meaningful names, unusable values set to NA and the data sets have been re-joined into one. <br />
 </div>
 :::
 
 ::: {.column width="50%"}
-<div style="font-size: 0.45em">
-```{r}
-#| echo: true
-# 01_load_data.qmd
-library("tidyverse")
-raw_data <- read_tsv(file = "https://hbiostat.org/data/repo/nhgh.tsv")
-raw_data
-```
-</div>
-
-<div style="display: flex; font-size: 0.45em;">
-<div style="flex: 1;">
-```{.r}
-# 02_clean_data.qmd
-# Round age to the nearest
-# full year
-meta_data <- meta_data |>
-  mutate(age = floor(age))
-```
-</div>
-<!-- -->
-<div style="flex: 1">
-```{.r}
-# Change arbitrary categories
-# in the income values to NA
-meta_data <- meta_data |> 
-  mutate(income = case_when(
-    income == '< 20000' ~ NA,
-    income == '> 20000' ~ NA,
-    .default = income
-  ))
-```
-</div>
-<!-- -->
-<div style="flex: 1">
-```{.r}
-# 03_augment.qmd
-# Rename columns in the measurement data 
-measurements <- measurements |>
-  rename("id" = "seqn",
-         "medication" = "tx",
-         "diagnosis" = "dx",
-         "weight" = "wt",
-         "height" = "ht",
-         "tri_skinfold" = "tri",
-         "sub_skinfold" = "sub",
-         "creatinine" = "SCr")
-```
-</div></div>
-
-<div style="font-size: 0.45em">
+<div style="font-size: 0.8em">
+- <strong>03_augment</strong>:<br />Gender information converted to 0-1; conversions of units and introduction of 'dm_status' column.
+<br /></div>
+<div style="font-size: 0.6em">
 ```{.r}
 # 03_augment.qmd
 # Calculating "body fat percentage" and "conicity index".
@@ -124,14 +76,33 @@ diabetes_data <- diabetes_data |>
 ::::
 
 ## Descriptive analysis
-
-
 ::: {.column width="50%"}
 ::: {.nonincremental}
-Observations: 6795<br>
-Variables (augmented): 26<br>
-Diagnosed: 914<br>
-Medicated: 607<br>
+
+```{r}
+#| message: false
+obs_and_variables <- read_tsv(file = '../results/04_obs_and_variables.tsv') |>
+  pull('dim(diabetes_data)')
+obs <- obs_and_variables |> 
+  nth(1)
+vari <- obs_and_variables |> 
+  nth(2)
+diagnosed_and_medicated <- read_tsv(file = '../results/04_diagnosed_and_medicated.tsv') |>
+  pull(n)
+undiagnosed <- diagnosed_and_medicated |> 
+  nth(1) 
+diagnosed_nonmedicated <- diagnosed_and_medicated |> 
+  nth(2)
+Medicated <- diagnosed_and_medicated |> 
+  nth(3)
+
+Diagnosed <- diagnosed_nonmedicated + Medicated
+```
+
+Observations: `r obs` \
+Variables (augmented): `r vari` \
+Diagnosed: `r Diagnosed` \
+Medicated: `r Medicated` \
 
 ![](../results/04_age_dist.png){.absolute bottom=0 left=0 width="500" height="330"}
 :::
@@ -141,7 +112,6 @@ Medicated: 607<br>
 
 ## Data Visualization: Diabetes vs Income & Age
 <div style="font-size: 0.8em">
-Some amount of data visualization can be very useful to better understand our data and the phenomena underlying the diabetes disease.
 <div>
 <!-- Left: Plot 1 and 2 -->
 <div style="display: flex;">
@@ -245,17 +215,18 @@ value <- obs |>
 
 
 ## Discussion
+-  Income classes and medication.
+-  Medication effect.
 -  Relation between anthropocentric- and biomarker measurements.
 -  Classification and PCA: No clear relation.
 -  Confusion matrix: Low prediction for diabetes.
 -  Uneven distribution between diabetic and non-diabetic.
     -  Improvement: Larger group of diabetic.
 
--  Income classes and medication.
-
 
 Conclusion:
-Not any clear relation for diabetes.
+- Medication showed effect.
+- Modelling: No conclusion.
 
 
 
