@@ -1,0 +1,157 @@
+---
+title: "NHGH analysis"
+format:
+  revealjs:
+     slide-number: true
+     embed-resources: true
+     theme: moon
+      
+author: "Katrine Meldgård, Margrethe Bøe Lysø, Kristine Rosted Petersen, Enrico Leonardi and Pernille Jensen"
+---
+
+## Introduction {.smaller}
+#### NHANES glycohemoglobin data
+- National Health and Nutrition Examination Survey
+\
+\
+
+#### Diabetes Mellitus (DM) 
+
+- Type 1 Diabetes: Inefficient production of insulin. 
+\
+
+- Type 2 Diabetes: Inefficient utilization of insulin.
+\
+
+-   422 million diagnosed, 1.5 million deaths each year
+\
+\
+
+#### Aim
+-   Correlation between biomarkers/measurements and diabetes 
+-   Possibility of regaining values after medication
+-   How income classes influence getting diabetes and medication
+
+
+## Method
+
+Data set contained X observations with X variables after cleaning
+
+Data Wrangling
+
+Added
+
+## Descriptive analysis
+
+
+::: {.column width="50%"}
+::: {.nonincremental}
+Observations: 6795<br>
+Variables (augmented): 26<br>
+Diagnosed: 914<br>
+Medicated: 607<br>
+
+![](../results/04_age_dist.png){.absolute bottom=0 left=0 width="500" height="330"}
+:::
+![](../results/04_bmi_dist.png){.absolute top=0 right=0 width="500" height="330"}
+![](../results/04_bmi_dist_diagnosed.png){.absolute bottom=0 right=0 width="500" height="330"}
+:::
+
+
+
+## Income vs. medication
+
+## Biomarkers and diagnosis/medication status
+
+```{r, echo = FALSE, out.width = "800px"}
+knitr::include_graphics("../results/06_biomark_box.png")
+```
+
+## Physical attributes and disease/medication status
+
+```{r, echo = FALSE, out.width = "800px"}
+knitr::include_graphics("../results/06_phys_heat.png")
+```
+
+::: aside
+1: Undiagnosed, 2: Diagnosed, unmedicated, 3: Diagnosed, medicated
+:::
+
+## PCA Analysis
+:::: {.columns}
+
+::: {.column width="60%"}
+::: {.nonincremental}
+- Data
+  - Non-medicated individuals
+- Classes not seperated
+:::
+
+:::
+
+
+![](../results/07_PCA_plot.png){.absolute top=0 right=0 width="450" height="320"}
+![](../results/07_pc_variance.png){.absolute top=350 right=0 width="450" height="320"}
+
+::::
+
+
+
+
+## Logistic regression model {.smaller}
+:::: {.columns}
+::: {.column width="30%"}
+- Backwards selection:
+   - Weight
+   - Leg
+   - Waist
+   - Creatinine
+   - Glycohemoglobin
+:::
+::: {.column width="67%"}
+
+```{r LR_model, echo=FALSE, out.width='100%'}
+knitr::include_graphics("../results/08_LR_model.png")
+```
+:::
+::::
+
+## Classification 
+:::: {.columns}
+
+::: {.column width="60%"}
+::: {.nonincremental}
+- Model based on parameters found by LR
+- Data
+  - Non-medicated individuals
+- Not many predicted as 1
+- AUC is low
+:::
+
+:::
+
+
+
+![](../results/09_classification_conf_matrix.png){.absolute top=350 left=0 width="500" height="300"}
+![](../results/09_classification_ROC_curve.png){.absolute top=0 right=0 width="500" height="370"}
+
+::::
+
+
+## Discussion
+-  Relation between anthropocentric- and biomarker measurements.
+-  Classification and PCA: No clear relation.
+-  Confusion matrix: Low prediction for diabetes.
+-  Uneven distribution between diabetic and non-diabetic.
+    -  Improvement: Larger group of diabetic.
+
+-  Income classes and medication.
+
+
+Conclusion:
+Not any clear relation for diabetes.
+
+
+
+
+

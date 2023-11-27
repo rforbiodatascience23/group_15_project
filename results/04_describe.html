@@ -372,16 +372,25 @@ library(&quot;ggthemes&quot;)</code></pre>
 <p>There are 6795 observation distributed in 20 different variables</p>
 <pre class="r"><code>diabetes_data |&gt;
   dim()</code></pre>
-<pre><code>## [1] 6795   26</code></pre>
+<pre><code>[1] 6795   26</code></pre>
 <p>The variables have the different names</p>
 <pre class="r"><code>diabetes_data |&gt; 
   colnames()</code></pre>
-<pre><code>##  [1] &quot;id&quot;           &quot;sex&quot;          &quot;age&quot;          &quot;ethnicity&quot;    &quot;income&quot;       &quot;medication&quot;   &quot;diagnosis&quot;    &quot;dm_status&quot;    &quot;weight&quot;      
-## [10] &quot;height&quot;       &quot;bmi&quot;          &quot;leg&quot;          &quot;arml&quot;         &quot;armc&quot;         &quot;waist&quot;        &quot;tri_skinfold&quot; &quot;sub_skinfold&quot; &quot;gh&quot;          
-## [19] &quot;albumin&quot;      &quot;bun&quot;          &quot;creatinine&quot;   &quot;bin_sex&quot;      &quot;bfp&quot;          &quot;waist_m&quot;      &quot;height_m&quot;     &quot;ci&quot;</code></pre>
+<pre><code> [1] &quot;id&quot;           &quot;sex&quot;          &quot;age&quot;          &quot;ethnicity&quot;    &quot;income&quot;      
+ [6] &quot;medication&quot;   &quot;diagnosis&quot;    &quot;dm_status&quot;    &quot;weight&quot;       &quot;height&quot;      
+[11] &quot;bmi&quot;          &quot;leg&quot;          &quot;arml&quot;         &quot;armc&quot;         &quot;waist&quot;       
+[16] &quot;tri_skinfold&quot; &quot;sub_skinfold&quot; &quot;gh&quot;           &quot;albumin&quot;      &quot;bun&quot;         
+[21] &quot;creatinine&quot;   &quot;bin_sex&quot;      &quot;bfp&quot;          &quot;waist_m&quot;      &quot;height_m&quot;    
+[26] &quot;ci&quot;          </code></pre>
 <p>Distribution of diagnosis</p>
 <pre class="r"><code>diabetes_data |&gt;
   count(dm_status)</code></pre>
+<pre><code># A tibble: 3 × 2
+  dm_status     n
+      &lt;dbl&gt; &lt;int&gt;
+1         1  5881
+2         2   307
+3         3   607</code></pre>
 </div>
 <div id="gender-distribution" class="section level1">
 <h1>Gender distribution</h1>
@@ -389,6 +398,11 @@ library(&quot;ggthemes&quot;)</code></pre>
 with 3423 females and 3372 males.</p>
 <pre class="r"><code>diabetes_data |&gt;
   count(sex)</code></pre>
+<pre><code># A tibble: 2 × 2
+  sex        n
+  &lt;chr&gt;  &lt;int&gt;
+1 female  3423
+2 male    3372</code></pre>
 </div>
 <div id="age-distribution-plot" class="section level1">
 <h1>Age distribution plot</h1>
