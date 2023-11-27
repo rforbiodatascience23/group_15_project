@@ -1,0 +1,232 @@
+---
+title: "NHGH analysis"
+format:
+  revealjs:
+     slide-number: true
+     embed-resources: true
+     theme: moon
+      
+author: "Katrine Meldgård, Margrethe Bøe Lysø, Kristine Rosted Petersen, Enrico Leonardi and Pernille Jensen"
+---
+```{r}
+library('tidyverse')
+```
+
+
+## Introduction {.smaller}
+#### NHANES glycohemoglobin data
+- National Health and Nutrition Examination Survey
+\
+\
+
+#### Diabetes Mellitus (DM) 
+
+- Type 1 Diabetes: Inefficient production of insulin. 
+\
+
+- Type 2 Diabetes: Inefficient utilization of insulin.
+\
+
+-   422 million diagnosed, 1.5 million deaths each year
+\
+\
+
+#### Aim
+-   Correlation between biomarkers/measurements and diabetes 
+-   Possibility of regaining values after medication
+-   How income classes influence getting diabetes and medication
+
+
+## Methods
+:::: {.columns}
+::: {.column width="50%"}
+<div style="font-size: 0.8em">
+- <strong>Raw data</strong>:<br />6795 observations with 20 variables.<br />
+- <strong>01_load_data</strong>:<br />Data has been loaded and splitted in metadata and measurements.<br />
+- <strong>02_clean_data</strong> (Data Wrangling):<br />Age values converted to integers, column names replaced with more meaningful names, unusable values set to NA and the data sets have been re-joined into one. <br />
+</div>
+:::
+
+::: {.column width="50%"}
+<div style="font-size: 0.8em">
+- <strong>03_augment</strong>:<br />Gender information converted to 0-1; conversions of units and introduction of 'dm_status' column.
+<br /></div>
+<div style="font-size: 0.6em">
+```{.r}
+# 03_augment.qmd
+# Calculating "body fat percentage" and "conicity index".
+# Add new variables
+diabetes_data <- diabetes_data |> 
+  mutate(bin_sex = case_when(
+                    sex == "male" ~ 1,
+                    sex == "female" ~ 0
+                  ),
+         bfp = 1.39*bmi+0.16*age-10.34*bin_sex-9,
+         waist_m = waist/100,
+         height_m = height/100,
+         ci = waist_m/(0.109*sqrt(weight/(height_m))),
+         dm_status = case_when(
+                      diagnosis == 0 ~ 1,
+                      diagnosis == 1 & medication == 0 ~ 2,
+                      diagnosis == 1 & medication == 1 ~ 3
+         ))
+```
+</div>
+:::
+::::
+
+## Descriptive analysis
+::: {.column width="50%"}
+::: {.nonincremental}
+
+```{r}
+#| message: false
+obs_and_variables <- read_tsv(file = '../results/04_obs_and_variables.tsv') |>
+  pull('dim(diabetes_data)')
+obs <- obs_and_variables |> 
+  nth(1)
+vari <- obs_and_variables |> 
+  nth(2)
+diagnosed_and_medicated <- read_tsv(file = '../results/04_diagnosed_and_medicated.tsv') |>
+  pull(n)
+undiagnosed <- diagnosed_and_medicated |> 
+  nth(1) 
+diagnosed_nonmedicated <- diagnosed_and_medicated |> 
+  nth(2)
+Medicated <- diagnosed_and_medicated |> 
+  nth(3)
+
+Diagnosed <- diagnosed_nonmedicated + Medicated
+```
+
+Observations: `r obs` \
+Variables (augmented): `r vari` \
+Diagnosed: `r Diagnosed` \
+Medicated: `r Medicated` \
+
+![](../results/04_age_dist.png){.absolute bottom=0 left=0 width="500" height="330"}
+:::
+![](../results/04_bmi_dist.png){.absolute top=0 right=0 width="500" height="330"}
+![](../results/04_bmi_dist_diagnosed.png){.absolute bottom=0 right=0 width="500" height="330"}
+:::
+
+## Data Visualization: Diabetes vs Income & Age
+<div style="font-size: 0.8em">
+<div>
+<!-- Left: Plot 1 and 2 -->
+<div style="display: flex;">
+<div style="flex: 1;">
+```{r diabetes-vs-income, echo=FALSE, out.width='100%'}
+knitr::include_graphics("../results/05_bar_income.png")
+```
+</div>
+<!-- Right: Plot 3 -->
+<div style="flex: 1">
+```{r diabetes-vs-age, echo=FALSE, out.width='100%'}
+knitr::include_graphics("../results/05_bar_age.png")
+```
+</div></div>
+
+## Biomarkers and diagnosis/medication status
+
+```{r, echo = FALSE, out.width = "800px"}
+knitr::include_graphics("../results/06_biomark_box.png")
+```
+
+## Physical attributes and disease/medication status
+
+```{r, echo = FALSE, out.width = "800px"}
+knitr::include_graphics("../results/06_phys_heat.png")
+```
+
+::: aside
+1: Undiagnosed, 2: Diagnosed, unmedicated, 3: Diagnosed, medicated
+:::
+
+## PCA Analysis {.smaller}
+:::: {.columns}
+
+::: {.column width="50%"}
+::: {.nonincremental}
+- Data
+  - Non-medicated individuals
+  - No observations with NA
+  - Only anthropometric and biomarker measurements
+- Classes not seperated
+:::
+:::
+
+
+![](../results/07_PCA_plot.png){.absolute top=0 width=43% right=0}
+![](../results/07_pc_variance.png){.absolute bottom=0 width=43% right=0}
+
+::::
+
+
+
+
+## Logistic regression model {.smaller}
+:::: {.columns}
+::: {.column width="30%"}
+- Backwards selection:
+   - Weight
+   - Leg
+   - Waist
+   - Creatinine
+   - Glycohemoglobin
+:::
+::: {.column width="67%"}
+
+```{r LR_model, echo=FALSE, out.width='100%'}
+knitr::include_graphics("../results/08_LR_model.png")
+```
+:::
+::::
+
+## Classification {.smaller}
+:::: {.columns}
+```{r}
+#| message: false
+auc_value <- read_tsv(file = '../results/auc_value.tsv') |>
+  pull(.estimate)
+
+```
+
+
+::: {.column width="60%"}
+::: {.nonincremental}
+- Model based on parameters found by LR
+- Data
+  - Non-medicated individuals
+  - No observations with NA
+- ~all predicted as 0
+- AUC = `r auc_value`
+:::
+
+:::
+
+![](../results/09_classification_conf_matrix.png){.absolute top=0 width=43% right=0}
+![](../results/09_classification_ROC_curve.png){.absolute bottom=0 width=43% right=0}
+
+::::
+
+
+## Discussion {.smaller}
+-  Income classes and medication.
+-  Medication effect.
+-  Relation between anthropocentric- and biomarker measurements.
+-  Classification and PCA: No clear relation.
+-  Confusion matrix: Low prediction for diabetes.
+-  Uneven distribution between diabetic and non-diabetic.
+    -  Improvement: Larger group of diabetic.\
+  \
+
+
+### Conclusion:\
+- Medication showed effect.\
+- Modelling: No conclusion.
+
+
+
+
+

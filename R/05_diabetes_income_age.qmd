@@ -6,25 +6,26 @@ format:
 editor: visual
 ---
 
-# Clear environment
+### Clear environment
 ```{r}
 rm(list = ls())
 ```
 
-# Load libraries
+### Load libraries
 ```{r}
 #| message: false
 library("tidyverse")
+library("patchwork")
 ```
 
-# Load data
+### Load data
 ```{r}
 #| message: false
 diabetes_data <- read_tsv(file = "../data/03_diabetes_data_augment.tsv",
                           na = 'NA')
 ```
 
-# This visualisation aims to investigate whether family income (and therefore, whealthy lifestyle) is a factor or not on diabetes manifestation.
+This visualisation aims to investigate whether family income (and therefore, whealthy lifestyle) is a factor or not on diabetes manifestation.
 ```{r}
 plot1_data <- diabetes_data |>
                   mutate(income = factor(income, levels = c('[0,5000)','[5000,10000)','[10000,15000)','[15000,20000)','[20000,25000)',
@@ -47,11 +48,13 @@ plot1 <- plot1_data |>
         ) +
         theme_minimal() +
         theme(
-          text = element_text(size=10),
+          text = element_text(size=5.3),
           axis.text.x = element_text(angle = 15,
                                      vjust = 1,
                                      hjust = 1),
-          plot.title = element_text(hjust = 0.5)
+          plot.title = element_text(hjust = 0.5),
+          plot.background = element_rect(fill = "white"),
+          panel.background = element_rect(fill = "white")
         ) +
         coord_cartesian(ylim = c(0, 25)) +
         labs(
@@ -60,14 +63,10 @@ plot1 <- plot1_data |>
           y = "% of diabetes diagnosed"
         )
 
-ggsave(plot1, 
-       filename = "../results/05_bar_income.png",
-       device = "png"
-       )
-
 plot1
 ```
-# This visualisation aims to investigate whether family income might be a determinant factor on the choice to pursue medications given being diagnosed with diabetes.
+
+This visualisation aims to investigate whether family income might be a determinant factor on the choice to pursue medications given being diagnosed with diabetes.
 ```{r}
 plot2_data <- diabetes_data |>
                   mutate(income = factor(income, levels = c('[0,5000)','[5000,10000)','[10000,15000)','[15000,20000)','[20000,25000)',
@@ -90,11 +89,13 @@ plot2 <- plot2_data |>
           ) +
           theme_minimal() +
           theme(
-            text = element_text(size=10),
+            text = element_text(size=5.3),
             axis.text.x = element_text(angle = 15,
                                        vjust = 1,
                                        hjust = 1),
-            plot.title = element_text(hjust = 0.5)
+            plot.title = element_text(hjust = 0.5),
+            plot.background = element_rect(fill = "white"),
+            panel.background = element_rect(fill = "white")
           ) +
           coord_cartesian(ylim = c(0, 85)) +
           labs(
@@ -103,14 +104,26 @@ plot2 <- plot2_data |>
             y = "% of medicated people"
           )
 
-ggsave(plot2, 
-       filename = "../results/05_bar_med.png",
-       device = "png"
-       )
 
 plot2
 ```
-# This visualisation aims to investigate how the age can be a factor to take into account within being susceptible to diabetes.
+
+###Combining the plots
+```{r}
+combined_plot <- plot1 / plot2
+combined_plot
+
+ggsave(combined_plot, 
+       filename = "../results/05_bar_income.png",
+       device = "png",
+       width = 960,
+       height = 1080,
+       units = "px"
+       )
+
+```
+
+This visualisation aims to investigate how the age can be a factor to take into account within being susceptible to diabetes.
 ```{r}
 plot3_data <- diabetes_data |>
                   arrange(age) |>
@@ -132,8 +145,10 @@ plot3 <- plot3_data |>
                 ) +
                 theme_minimal() +
                 theme(
-                  text = element_text(size = 10),
-                  plot.title = element_text(hjust = 0.5)
+                  text = element_text(size = 5.3),
+                  plot.title = element_text(hjust = 0.5),
+                  plot.background = element_rect(fill = "white"),
+                  panel.background = element_rect(fill = "white")
                 ) +
                 coord_cartesian(ylim = c(0, 60)) +
                 labs(
@@ -144,7 +159,10 @@ plot3 <- plot3_data |>
 
 ggsave(plot3, 
        filename = "../results/05_bar_age.png",
-       device = "png"
+       device = "png",
+       width = 960,
+       height = 1080,
+       units = "px"
        )
 
 plot3

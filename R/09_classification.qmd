@@ -114,7 +114,8 @@ conf_plot <- conf_data |>
             linewidth = 0.3) +
   scale_fill_gradient(low = 'beige',
                        high = 'skyblue3') +
-  geom_text(mapping = aes(label = n)) +
+  geom_text(mapping = aes(label = n),
+            size = 7) +
   theme_minimal() +
   labs(title = 'Confusion matrix',
          x = 'Truth',
@@ -123,7 +124,9 @@ conf_plot <- conf_data |>
   scale_y_discrete(expand = c(0,0)) +
   coord_fixed() +
   theme_bw(base_size = 14) +
-  theme(plot.title = element_text(hjust = 0.5)) 
+  theme(plot.title = element_text(size = 23,
+                                  hjust = 0.5),
+        axis.title = element_text(size = 20)) 
 
 conf_plot
 
@@ -175,8 +178,17 @@ ggsave(plot = roc_plot,
 # AUC
 
 ```{r}
-class_prob |> 
+auc <- class_prob |> 
   roc_auc(diagnosis,
           .pred_1,
-          event_level = 'second')
+          event_level = 'second') |>
+  dplyr::select(.metric, .estimate)
+
+```
+
+# Save important variables
+
+```{r}
+auc |>
+  write_tsv(file = '../results/auc_value.tsv')
 ```

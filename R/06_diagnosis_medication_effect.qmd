@@ -7,12 +7,12 @@ editor: visual
 ---
 
 ## Analysis: Biomarker levels for D/M status
+
 ### Clear Environment
 
 ```{r}
 rm(list = ls())
 ```
-
 
 ### Loading libraries
 
@@ -45,7 +45,7 @@ p1 <- diabetes_data |>
         x = "Status",
         y = "Albumin(g/dL)"
       ) + 
-      scale_x_discrete(labels = c('Undiagnosed','Diagnosed Med','Diagnosed Unmed')) +
+      scale_x_discrete(labels = c('Undiagnosed','Diagnosed Unmed','Diagnosed Med')) +
       theme_minimal() +
       theme(legend.position="none",
             axis.text.x = element_text(angle = 15,
@@ -64,7 +64,7 @@ p2 <- diabetes_data |>
         x = "Status",
         y = "BUN (mg/dL)"
       ) + 
-      scale_x_discrete(labels = c('Undiagnosed','Diagnosed Med','Diagnosed Unmed')) +
+      scale_x_discrete(labels = c('Undiagnosed','Diagnosed Unmed','Diagnosed Med')) +
       theme_minimal() +
       theme(legend.position="none",
             axis.text.x = element_text(angle = 15,
@@ -84,7 +84,7 @@ p3 <- diabetes_data |>
         y = "Creatinine(mg/dL)"
       ) + 
       coord_cartesian(ylim = c(0, 7)) +
-      scale_x_discrete(labels = c('Undiagnosed','Diagnosed Med','Diagnosed Unmed')) +
+      scale_x_discrete(labels = c('Undiagnosed','Diagnosed Unmed','Diagnosed Med')) +
       theme_minimal() +
       theme(legend.position="none",
             axis.text.x = element_text(angle = 15,
@@ -102,7 +102,7 @@ p4 <- diabetes_data |>
         x = "Status",
         y = "Glycohemoglobin(%)"
       ) + 
-      scale_x_discrete(labels = c('Undiagnosed','Diagnosed Med','Diagnosed Unmed')) +
+      scale_x_discrete(labels = c('Undiagnosed','Diagnosed Unmed','Diagnosed Med')) +
       theme_minimal() +
       theme(legend.position="none", 
             axis.text.x = element_text(angle = 15,
@@ -163,7 +163,9 @@ phys_heat <- diabetes_standard |>
          y = "D/M status",
          fill = "Value") + 
     theme_minimal() +
-    theme(plot.title = element_text(hjust = 0.5)) 
+    theme(plot.title = element_text(hjust = 0.5)) +
+    theme(plot.background = element_rect(fill = "white"),
+          panel.background = element_rect(fill = "white"))
 
 
 #1: Undiagnosed
@@ -177,4 +179,5 @@ ggsave(phys_heat,
        width = 24, 
        units = "cm")
 
+phys_heat
 ```

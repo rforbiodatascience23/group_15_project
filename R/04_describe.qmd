@@ -34,8 +34,13 @@ diabetes_data <- read_tsv(file = '../data/03_diabetes_data_augment.tsv',
 There are 6795 observation distributed in 20 different variables
 
 ```{r}
-diabetes_data |>
-  dim()
+ obs_and_variables <- diabetes_data |>
+  dim() |>
+  tibble()
+
+ 
+obs_and_variables |>
+  write_tsv('../results/04_obs_and_variables.tsv')
 ```
 
 The variables have the different names
@@ -48,8 +53,11 @@ diabetes_data |>
 Distribution of diagnosis
 
 ```{r}
-diabetes_data |>
-  count(dm_status)
+diagnosed_and_medicated <- diabetes_data |>
+  count(dm_status) 
+  
+diagnosed_and_medicated |>
+  write_tsv('../results/04_diagnosed_and_medicated.tsv')
 ```
 
 # Gender distribution
@@ -75,6 +83,7 @@ age_dist <- diabetes_data |>
        x = 'Age',
        y = 'Number of people') +
   theme_minimal() +
+  theme_bw(base_size = 14) +
   theme(plot.title = element_text(hjust = 0.5))
 
 # save plot to results 
@@ -107,6 +116,7 @@ bmi_dist <- diabetes_data |>
                  fill='lightblue', 
                  binwidth = 2) +
   theme_minimal() +
+  theme_bw(base_size = 14) +
   labs(title = 'BMI distribution in the study population',
        x = bquote('BMI'~(kg/m^2)),
        y = 'Number of people') +
@@ -137,6 +147,7 @@ bmi_dist_diagnosed <- non_medicated_data |>
                        y = bmi)) +
   geom_boxplot(aes(colour = diagnosis)) +
   theme_minimal() +
+  theme_bw(base_size = 14) +
   scale_color_colorblind() +
   labs(title = 'BMI distribution in the study population',
        x = 'Diabetes diagnosis',

@@ -8,9 +8,9 @@ editor: visual
 
 # Run all scripts
 
-```{r}
+```{r 1}
 #| message: false
-#| results: hide
+#| results: false
 rmarkdown::render(input = '01_load_data.qmd',
                   output_dir = '../results')
 rmarkdown::render(input = '02_clean_data.qmd',
