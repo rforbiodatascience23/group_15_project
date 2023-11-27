@@ -9,22 +9,29 @@ format:
 author: "Katrine Meldgård, Margrethe Bøe Lysø, Kristine Rosted Petersen, Enrico Leonardi and Pernille Jensen"
 ---
 
-## Introduction
+## Introduction {.smaller}
+#### NHANES glycohemoglobin data
+- National Health and Nutrition Examination Survey
+\
+\
 
-Diabetes Mellitus is a chronic disease.
+#### Diabetes Mellitus (DM) 
 
--   Pancreas fails to produce sufficient amount of insulin.
--   The body cannot effectively utilize the insulin it generates.
+- Type 1 Diabetes: Inefficient production of insulin. 
+\
 
-Problem: More than 422 million people have diabetes and 1.5 million deaths each year are directly attributed to diabetes.
+- Type 2 Diabetes: Inefficient utilization of insulin.
+\
 
-Kidney disease?
+-   422 million diagnosed, 1.5 million deaths each year
+\
+\
 
-AIM of the project
+#### Aim
+-   Correlation between biomarkers/measurements and diabetes 
+-   Possibility of regaining values after medication
+-   How income classes influence getting diabetes and medication
 
-```{r, echo = FALSE, out.width = "800px"}
-#knitr::include_graphics("../results/04_.png")
-```
 
 ## Method
 
@@ -35,36 +42,22 @@ Data Wrangling
 Added
 
 ## Descriptive analysis
-<div style="display: flex; flex-wrap: wrap;">
 
-<!-- Upper Left: Text -->
-<div style="flex: 50%; box-sizing: border-box; padding: 10px;">
+
+::: {.column width="50%"}
+::: {.nonincremental}
 Observations: 6795<br>
 Variables (augmented): 26<br>
 Diagnosed: 914<br>
 Medicated: 607<br>
-</div>
 
-<!-- Upper Right: Plot 2 -->
-<div style="flex: 50%; box-sizing: border-box; padding: 10px;">
-```{r bmi-dist-plot, echo=FALSE, out.width='100%'}
-knitr::include_graphics("../results/04_bmi_dist.png")
-```
-</div>
+![](../results/04_age_dist.png){.absolute bottom=0 left=0 width="500" height="330"}
+:::
+![](../results/04_bmi_dist.png){.absolute top=0 right=0 width="500" height="330"}
+![](../results/04_bmi_dist_diagnosed.png){.absolute bottom=0 right=0 width="500" height="330"}
+:::
 
-<!-- Lower Left: Plot 1 -->
-<div style="flex: 50%; box-sizing: border-box; padding: 10px;">
-```{r age-dist-plot, echo=FALSE, out.width='100%'}
-knitr::include_graphics("../results/04_age_dist.png")
-```
-</div>
 
-<!-- Lower Right: Plot 3 -->
-<div style="flex: 50%; box-sizing: border-box; padding: 10px;">
-```{r bmi-dist-diagnosed-plot, echo=FALSE, out.width='100%'}
-knitr::include_graphics("../results/04_bmi_dist_diagnosed.png")
-```
-</div>
 
 ## Income vs. medication
 
