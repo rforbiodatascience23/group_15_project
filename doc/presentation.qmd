@@ -120,14 +120,33 @@ diabetes_data <- diabetes_data |>
 ::::
 
 ## Descriptive analysis
-
-
 ::: {.column width="50%"}
 ::: {.nonincremental}
-Observations: 6795<br>
-Variables (augmented): 26<br>
-Diagnosed: 914<br>
-Medicated: 607<br>
+
+```{r}
+#| message: false
+obs_and_variables <- read_tsv(file = '../results/04_obs_and_variables.tsv') |>
+  pull('dim(diabetes_data)')
+obs <- obs_and_variables |> 
+  nth(1)
+vari <- obs_and_variables |> 
+  nth(2)
+diagnosed_and_medicated <- read_tsv(file = '../results/04_diagnosed_and_medicated.tsv') |>
+  pull(n)
+undiagnosed <- diagnosed_and_medicated |> 
+  nth(1) 
+diagnosed_nonmedicated <- diagnosed_and_medicated |> 
+  nth(2)
+Medicated <- diagnosed_and_medicated |> 
+  nth(3)
+
+Diagnosed <- diagnosed_nonmedicated + Medicated
+```
+
+Observations: `r obs` \
+Variables (augmented): `r vari` \
+Diagnosed: `r Diagnosed` \
+Medicated: `r Medicated` \
 
 ![](../results/04_age_dist.png){.absolute bottom=0 left=0 width="500" height="330"}
 :::

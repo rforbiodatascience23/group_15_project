@@ -34,8 +34,13 @@ diabetes_data <- read_tsv(file = '../data/03_diabetes_data_augment.tsv',
 There are 6795 observation distributed in 20 different variables
 
 ```{r}
-diabetes_data |>
-  dim()
+ obs_and_variables <- diabetes_data |>
+  dim() |>
+  tibble()
+
+ 
+obs_and_variables |>
+  write_tsv('../results/04_obs_and_variables.tsv')
 ```
 
 The variables have the different names
@@ -48,8 +53,11 @@ diabetes_data |>
 Distribution of diagnosis
 
 ```{r}
-diabetes_data |>
-  count(dm_status)
+diagnosed_and_medicated <- diabetes_data |>
+  count(dm_status) 
+  
+diagnosed_and_medicated |>
+  write_tsv('../results/04_diagnosed_and_medicated.tsv')
 ```
 
 # Gender distribution
