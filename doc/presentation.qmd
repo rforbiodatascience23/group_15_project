@@ -33,13 +33,91 @@ author: "Katrine Meldgård, Margrethe Bøe Lysø, Kristine Rosted Petersen, Enri
 -   How income classes influence getting diabetes and medication
 
 
-## Method
+## Methods
+:::: {.columns}
+::: {.column width="50%"}
+<div style="font-size: 0.7em">
+- <strong>Raw data</strong>: 6795 observations with 20 variables.
+- <strong>01_load_data</strong>: Data has been loaded and splitted in metadata and measurements.
+- <strong>02_clean_data</strong> (Data Wrangling): age values converted to integers, column names replaced with more meaningful names, unusable values set to NA and the data sets have been re-joined into one.
+- <strong>03_augment</strong>: gender information converted to 0-1; conversions of units and introduction of 'dm_status' column.
+</div>
+:::
 
-Data set contained X observations with X variables after cleaning
+::: {.column width="50%"}
+<div style="font-size: 0.45em">
+```{r}
+#| echo: true
+# 01_load_data.qmd
+library("tidyverse")
+raw_data <- read_tsv(file = "https://hbiostat.org/data/repo/nhgh.tsv")
+raw_data
+```
+</div>
 
-Data Wrangling
+<div style="display: flex; font-size: 0.45em;">
+<div style="flex: 1;">
+```{.r}
+# 02_clean_data.qmd
+# Round age to the nearest
+# full year
+meta_data <- meta_data |>
+  mutate(age = floor(age))
+```
+</div>
+<!-- -->
+<div style="flex: 1">
+```{.r}
+# Change arbitrary categories
+# in the income values to NA
+meta_data <- meta_data |> 
+  mutate(income = case_when(
+    income == '< 20000' ~ NA,
+    income == '> 20000' ~ NA,
+    .default = income
+  ))
+```
+</div>
+<!-- -->
+<div style="flex: 1">
+```{.r}
+# 03_augment.qmd
+# Rename columns in the measurement data 
+measurements <- measurements |>
+  rename("id" = "seqn",
+         "medication" = "tx",
+         "diagnosis" = "dx",
+         "weight" = "wt",
+         "height" = "ht",
+         "tri_skinfold" = "tri",
+         "sub_skinfold" = "sub",
+         "creatinine" = "SCr")
+```
+</div></div>
 
-Added
+<div style="font-size: 0.45em">
+```{.r}
+# 03_augment.qmd
+# Calculating "body fat percentage" and "conicity index".
+# Add new variables
+diabetes_data <- diabetes_data |> 
+  mutate(bin_sex = case_when(
+                    sex == "male" ~ 1,
+                    sex == "female" ~ 0
+                  ),
+         bfp = 1.39*bmi+0.16*age-10.34*bin_sex-9,
+         waist_m = waist/100,
+         height_m = height/100,
+         ci = waist_m/(0.109*sqrt(weight/(height_m))),
+         dm_status = case_when(
+                      diagnosis == 0 ~ 1,
+                      diagnosis == 1 & medication == 0 ~ 2,
+                      diagnosis == 1 & medication == 1 ~ 3
+         ))
+```
+</div>
+:::
+::::
 
 ## Descriptive analysis
 
