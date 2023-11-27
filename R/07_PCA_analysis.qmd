@@ -95,18 +95,21 @@ ggsave(plot = pca_plot,
 #| message: false
 pc_variance <- pca_fit |> 
   tidy(matrix = 'eigenvalues') |> 
+  mutate(cumulative = round(cumulative, 2)) |>
   ggplot(mapping = aes(x = PC,
-                       y = percent)) +
-  geom_col(fill = 'deepskyblue3',
-           alpha = 0.7) +
+                       y = cumulative)) +
+  geom_point() +
   theme_minimal() +
   scale_x_continuous(breaks = 1:13) +
-  scale_y_continuous(limits = c(0,0.4),
+  scale_y_continuous(limits = c(0,1.1),
                      labels = scales::percent_format(),
                      expand = c(0,0)) +
-  labs(title = 'Variance explained by each principal component',
+  geom_text(mapping = aes(label = cumulative),
+            size = 4,
+            nudge_y = 0.05) +
+  labs(title = 'Cumulative variance explained by the principal components',
        x = 'Principal Component',
-       y = 'Variance explained (%)') +
+       y = 'Cumulative variance (%)') +
   theme_bw(base_size = 14) +
   theme(plot.title = element_text(hjust = 0.5)) 
 

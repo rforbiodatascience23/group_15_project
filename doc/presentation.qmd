@@ -70,21 +70,22 @@ knitr::include_graphics("../results/04_bmi_dist_diagnosed.png")
 
 ## ???
 
-## PCA Analysis
+## PCA Analysis {.smaller}
 :::: {.columns}
 
-::: {.column width="60%"}
+::: {.column width="50%"}
 ::: {.nonincremental}
 - Data
   - Non-medicated individuals
+  - No observations with NA
+  - Only anthropometric and biomarker measurements
 - Classes not seperated
 :::
-
 :::
 
 
-![](../results/07_PCA_plot.png){.absolute top=0 right=0 width="450" height="320"}
-![](../results/07_pc_variance.png){.absolute top=350 right=0 width="450" height="320"}
+![](../results/07_PCA_plot.png){.absolute top=0 width=50% right=0}
+![](../results/07_pc_variance.png){.absolute bottom=0 width=50% right=0}
 
 ::::
 
@@ -94,24 +95,30 @@ knitr::include_graphics("../results/04_bmi_dist_diagnosed.png")
 ## Logistic regression model
 
 
-## Classification 
+## Classification {.smaller}
 :::: {.columns}
+```{r}
+#| message: false
+library('tidyverse')
+auc_value <- read_tsv(file = '../results/auc_value.tsv') |>
+  pull(.estimate)
+```
+
 
 ::: {.column width="60%"}
 ::: {.nonincremental}
 - Model based on parameters found by LR
 - Data
   - Non-medicated individuals
-- Not many predicted as 1
-- AUC is low
+  - No observations with NA
+- ~all predicted as 0
+- AUC = `r auc_value`
 :::
 
 :::
 
-
-
-![](../results/09_classification_conf_matrix.png){.absolute top=350 left=0 width="500" height="300"}
-![](../results/09_classification_ROC_curve.png){.absolute top=0 right=0 width="500" height="370"}
+![](../results/09_classification_conf_matrix.png){.absolute top=0 width=50% right=0}
+![](../results/09_classification_ROC_curve.png){.absolute bottom=0 width=50% right=0}
 
 ::::
 
